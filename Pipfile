@@ -7,6 +7,8 @@ name = "pypi"
 pep8 = "*"
 pylint = "*"
 black = "*"
+requests = "*"
+pyyaml = "*"
 
 [dev-packages]
 flake8 = "*"

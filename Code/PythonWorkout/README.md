@@ -1,4 +1,4 @@
-# Day 1
+# Py Workout
 
 1. while loop input
 2. int conversion
@@ -18,3 +18,10 @@
 - Dataclasses annotation
 - Subclassing
 - Class level attribute, add max_scope_size to class
+- Base class __init__ call from subclass via super().__init__(name)
+- Make BigBowl class subclass from Bowl, up max to 5
+- Animal
+    - species, color, number_of_legs
+    - Wolf, Sheep, Snake, Parrot
+    - species using self.__class__.__name__
+- Cages, add_animal, __repr__ list animals
