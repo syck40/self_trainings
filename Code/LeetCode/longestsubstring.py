@@ -11,6 +11,37 @@ Output: 3
 Explanation: The answer is "abc", with the length of 3.
 
 """
+def subs(s):
+    dic = {}
+    for k, v in enumerate(s):
+        if v not in dic:
+            dic[v] = k
+        else:
+            print(dic.popitem()[1]+1)
+            break
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class Solution():
     def __init__(self, s):
         self.tbl = {}

@@ -1,3 +1,7 @@
+```
+o(n)^2 Quadratic, bubble sort
+```
+
 # DS
 - 3 types of algo
     - dividing and conquer
@@ -42,7 +46,17 @@
     for j in range(len(l1)-1):
         for i in range(len(l1), 0, -1):
             replace(l1[i-1], l1[i])
-
+    - selection sort:
+    keep a track of lowest value as you iterate.
+    def ss(l1):
+        lowest = 0
+        for i in range(len(l1)):
+            lowest = i
+            for j in range(i+1, len(l1)):
+                if l1[j] < l1[lowest]:
+                    lowest = j
+            if lowest != i:
+                l1[i], l1[lowest] = l1[lowest], l1[i]
     - merge sort
     len(l1) #9, l1[0] -> l1[8]
     def divide(l1):
@@ -64,3 +78,28 @@
     - quick sort
     [6, 10, 16, 2, 4, 18, 8, 14, 12]
     pivot = 4, left_marker = 6, right_marker = 12
+    lm move to right, select 1st number >= pivot
+    rm move to left, select 1st number <= pivot
+    then swap the two number above
+- Recursion
+def loop(l1):
+    for i in range(l1, -1, -1):
+        print(i)
+
+def rec(l1):
+    if l1 < 0:
+        return
+    print(l1)
+    rec(l1-1)
+
+def lp(l1):
+    for i in range(len(l1), -1, -1):
+        print(l1[i])
+
+def rc(l1):
+    ln = len(l1)
+    if ln == 0:
+        return
+    else:
+        print(l1[-1])
+        rc(l1[:ln-1])
