@@ -47,7 +47,22 @@
     - [1.9.2. Psudo](#192-psudo)
     - [1.9.3. Problems](#193-problems)
       - [1.9.3.1. Design a class to calculate the median of a number stream.](#1931-design-a-class-to-calculate-the-median-of-a-number-stream)
-  - [1.10. Misc](#110-misc)
+  - [1.10. Subsets](#110-subsets)
+    - [1.10.1. Intro](#1101-intro)
+    - [1.10.2. Problems](#1102-problems)
+      - [1.10.2.1. Given a set with distinct elements, find all of its distinct subsets.](#11021-given-a-set-with-distinct-elements-find-all-of-its-distinct-subsets)
+      - [1.10.2.2. Given a set of numbers that might contain duplicates, find all of its distinct subsets.](#11022-given-a-set-of-numbers-that-might-contain-duplicates-find-all-of-its-distinct-subsets)
+      - [1.10.2.3. Permutations](#11023-permutations)
+  - [1.11. Binary Search](#111-binary-search)
+    - [1.11.1. Intro](#1111-intro)
+    - [1.11.2. Problems](#1112-problems)
+      - [1.11.2.1. Given a sorted array of numbers, find if a given number ‘key’ is present in the array. Though we know that the array is sorted, we don’t know if it’s sorted in ascending or descending order. You should assume that the array can have duplicates.](#11121-given-a-sorted-array-of-numbers-find-if-a-given-number-key-is-present-in-the-array-though-we-know-that-the-array-is-sorted-we-dont-know-if-its-sorted-in-ascending-or-descending-order-you-should-assume-that-the-array-can-have-duplicates)
+      - [1.11.2.2. Given an array of numbers sorted in an ascending order, find the ceiling of a given number ‘key’. The ceiling of the ‘key’ will be the smallest element in the given array greater than or equal to the ‘key’.](#11122-given-an-array-of-numbers-sorted-in-an-ascending-order-find-the-ceiling-of-a-given-number-key-the-ceiling-of-the-key-will-be-the-smallest-element-in-the-given-array-greater-than-or-equal-to-the-key)
+  - [1.12. Bit wise XOR](#112-bit-wise-xor)
+    - [1.12.1. Intro](#1121-intro)
+    - [1.12.2. Problems](#1122-problems)
+      - [1.12.2.1. Given an array of n−1 integers in the range from 1 to n, find the one number that is missing from the array.](#11221-given-an-array-of-n1-integers-in-the-range-from-1-to-n-find-the-one-number-that-is-missing-from-the-array)
+  - [1.13. Misc](#113-misc)
 
 
 ## 1.1. Sliding Window
@@ -558,11 +573,184 @@ print("Tree paths with sum " + str(sum) +
 -  The median is the middle value in an ordered integer list. So a brute force solution could be to maintain a sorted list of all numbers inserted in the class so that we can efficiently return the median whenever required.
 - Can we utilize the fact that we don’t need the fully sorted list.  We are only interested in finding the middle element?
 - one half to store all the smaller numbers (let’s call it smallNumList) and one half to store the larger numbers (let’s call it largNumList). The median of all the numbers will either be the largest number in the smallNumList or the smallest number in the largNumList. If the total number of elements is even, the median will be the average of these two numbers.
+1. insertNum(3): We can insert a number in the Max Heap (i.e. first half) if the number is smaller than the top (largest) number of the heap. After every insertion, we will balance the number of elements in both heaps, so that they have an equal number of elements. If the count of numbers is odd, let’s decide to have more numbers in Max Heap than the Min Heap.
+2. insertNum(1): As ‘1’ is smaller than ‘3’, let’s insert it into the Max Heap. Now, we have two elements in the Max Heap and no elements in Min Heap. Let’s take the largest element from the Max Heap and insert it into the Min Heap, to balance the number of elements in both heaps.
+3. findMedian(): As we have an even number of elements, the median will be the average of the top element of both the heaps -> 
+(1+3)/2=2.0
+4. insertNum(5): As ‘5’ is greater than the top element of the Max Heap, we can insert it into the Min Heap. After the insertion, the total count of elements will be odd. As we had decided to have more numbers in the Max Heap than the Min Heap, we can take the top (smallest) number from the Min Heap and insert it into the Max Heap.
+5. findMedian(): Since we have an odd number of elements, the median will be the top element of Max Heap -> 3. An odd number of elements also means that the Max Heap will have one extra element than the Min Heap.
+6. insertNum(4): Insert ‘4’ into Min Heap.
 
 ```
+from heapq import *
 
+
+class MedianOfAStream:
+
+  maxHeap = []  # containing first half of numbers
+  minHeap = []  # containing second half of numbers
+
+  def insert_num(self, num):
+    if not self.maxHeap or -self.maxHeap[0] >= num:
+      heappush(self.maxHeap, -num)
+    else:
+      heappush(self.minHeap, num)
+
+    # either both the heaps will have equal number of elements or max-heap will have one
+    # more element than the min-heap
+    if len(self.maxHeap) > len(self.minHeap) + 1:
+      heappush(self.minHeap, -heappop(self.maxHeap))
+    elif len(self.maxHeap) < len(self.minHeap):
+      heappush(self.maxHeap, -heappop(self.minHeap))
+
+  def find_median(self):
+    if len(self.maxHeap) == len(self.minHeap):
+      # we have even number of elements, take the average of middle two elements
+      return -self.maxHeap[0] / 2.0 + self.minHeap[0] / 2.0
+
+    # because max-heap will have one more element than the min-heap
+    return -self.maxHeap[0] / 1.0
+
+
+medianOfAStream = MedianOfAStream()
+medianOfAStream.insert_num(3)
+medianOfAStream.insert_num(1)
+print("The median is: " + str(medianOfAStream.find_median()))
+medianOfAStream.insert_num(5)
+print("The median is: " + str(medianOfAStream.find_median()))
+medianOfAStream.insert_num(4)
+print("The median is: " + str(medianOfAStream.find_median()))
 ```
+## 1.10. Subsets
+### 1.10.1. Intro
+- BFS
+### 1.10.2. Problems
+#### 1.10.2.1. Given a set with distinct elements, find all of its distinct subsets.
+- Input: [1, 3]
+Output: [], [1], [3], [1,3]
+```
+def find_subsets(nums):
+  subsets = []
+  # TODO: Write your code here
+  subsets.append([])
+  for i in nums:
+    n = len(subsets)
+    for j in range(n):
+      if subsets[j]:
+        ret = [subsets[j]]
+        ret.append(i)
+      else:
+        ret = [i]
+      subsets.append(ret)
+  return subsets
 
-## 1.10. Misc
+find_subsets([1, 3, 3])
+print("Here is the list of subsets: " + str(find_subsets([1, 3])))
+print("Here is the list of subsets: " + str(find_subsets([1, 5, 3])))
+```
+#### 1.10.2.2. Given a set of numbers that might contain duplicates, find all of its distinct subsets.
+- sort it with list.sort(nums)
+#### 1.10.2.3. Permutations
+- Input: [1,3,5]
+Output: [1,3,5], [1,5,3], [3,1,5], [3,5,1], [5,1,3], [5,3,1]
+```
+from collections import deque
+
+
+def find_permutations(nums):
+  numsLength = len(nums)
+  result = []
+  permutations = deque()
+  permutations.append([])
+  for currentNumber in nums:
+    # we will take all existing permutations and add the current number to create new permutations
+    n = len(permutations)
+    for _ in range(n):
+      oldPermutation = permutations.popleft()
+      # create a new permutation by adding the current number at every position
+      for j in range(len(oldPermutation)+1):
+        newPermutation = list(oldPermutation)
+        newPermutation.insert(j, currentNumber)
+        if len(newPermutation) == numsLength:
+          result.append(newPermutation)
+        else:
+          permutations.append(newPermutation)
+
+  return result
+find_permutations([1, 3, 5])
+```
+## 1.11. Binary Search
+### 1.11.1. Intro
+### 1.11.2. Problems
+#### 1.11.2.1. Given a sorted array of numbers, find if a given number ‘key’ is present in the array. Though we know that the array is sorted, we don’t know if it’s sorted in ascending or descending order. You should assume that the array can have duplicates.
+- Input: [4, 6, 10], key = 10
+Output: 2
+```
+def ss(n, k):
+  low = 0
+  high = len(n) - 1
+  ascending = True
+  if n[0] > n[1]:
+    ascending = False
+  while low <= high:
+    mid = (low + high) // 2
+    if n[mid] == k:
+      return mid
+
+    if ascending:
+      if n[mid] < k:
+        low = mid + 1
+      else:
+        high = mid - 1
+    else:
+      if n[mid] < k:
+        high = mid - 1
+      else:
+        low = mid + 1
+  return -1
+ss([4,6,10], 10)
+```
+#### 1.11.2.2. Given an array of numbers sorted in an ascending order, find the ceiling of a given number ‘key’. The ceiling of the ‘key’ will be the smallest element in the given array greater than or equal to the ‘key’.
+- Input: [4, 6, 10], key = 6
+Output: 1
+- Input: [1, 3, 8, 10, 15], key = 12
+Output: 4
+```
+def ss(n, k):
+  low, high = 0, len(n) - 1
+  while low <= high:
+    mid = (low + high) // 2
+    if n[mid] == k:
+      return mid
+    elif n[mid] < k:
+      low = mid + 1
+    else:
+      return mid
+  return -1
+ss([4, 6, 10], 6)
+```
+## 1.12. Bit wise XOR
+### 1.12.1. Intro
+- XOR is a logical bitwise operator that returns 0 (false) if both bits are the same and returns 1 (true) otherwise. In other words, it only returns 1 if exactly one bit is set to 1 out of the two bits in comparison.
+### 1.12.2. Problems
+#### 1.12.2.1. Given an array of n−1 integers in the range from 1 to n, find the one number that is missing from the array.
+- Input: 1, 5, 2, 6, 4
+Answer: 3
+
+
+
+
+## 1.13. Misc
 - list.append vs list + [new] vs list.extend()
 - The concatenation operator + is a binary infix operator which, when applied to lists, returns a new list containing all the elements of each of its two operands. The list.append() method is a mutator on list which appends its single object argument (in your specific example the list c) to the subject list. In your example this results in c appending a reference to itself (hence the infinite recursion).
+- heapsort with import heapq
+```
+import heapq
+def heapsort(iterable):
+  h = []
+  for value in iterable:
+      heapq.heappush(h, value)
+  return [heapq.heappop(h) for i in range(len(h))]
+
+heapsort([1, 3, 5, 7, 9, 2, 4, 6, 8, 0])
+
