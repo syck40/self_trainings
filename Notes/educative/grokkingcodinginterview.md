@@ -62,7 +62,26 @@
     - [1.12.1. Intro](#1121-intro)
     - [1.12.2. Problems](#1122-problems)
       - [1.12.2.1. Given an array of n−1 integers in the range from 1 to n, find the one number that is missing from the array.](#11221-given-an-array-of-n1-integers-in-the-range-from-1-to-n-find-the-one-number-that-is-missing-from-the-array)
-  - [1.13. Misc](#113-misc)
+      - [1.12.2.2. In a non-empty array of integers, every number appears twice except for one, find that single number.](#11222-in-a-non-empty-array-of-integers-every-number-appears-twice-except-for-one-find-that-single-number)
+  - [1.13. Top/Smallest/frequent K elements](#113-topsmallestfrequent-k-elements)
+    - [1.13.1. Intro](#1131-intro)
+    - [1.13.2. Problems](#1132-problems)
+      - [1.13.2.1. Given an unsorted array of numbers, find the ‘K’ largest numbers in it.](#11321-given-an-unsorted-array-of-numbers-find-the-k-largest-numbers-in-it)
+      - [1.13.2.2. Given an unsorted array of numbers, find Kth smallest number in it.](#11322-given-an-unsorted-array-of-numbers-find-kth-smallest-number-in-it)
+  - [1.14. K-way Merge](#114-k-way-merge)
+    - [1.14.1. Intro](#1141-intro)
+    - [1.14.2. Problems](#1142-problems)
+      - [1.14.2.1. Given an array of ‘K’ sorted LinkedLists, merge them into one sorted list.](#11421-given-an-array-of-k-sorted-linkedlists-merge-them-into-one-sorted-list)
+      - [1.14.2.2. Given ‘M’ sorted arrays, find the K’th smallest number among all the arrays.](#11422-given-m-sorted-arrays-find-the-kth-smallest-number-among-all-the-arrays)
+  - [1.15. Dynamic Programming - 0/1 Knapsack](#115-dynamic-programming---01-knapsack)
+    - [1.15.1. Intro](#1151-intro)
+    - [1.15.2. Problems](#1152-problems)
+      - [1.15.2.1. N items, C capacity, max profit, each item can only be selected once](#11521-n-items-c-capacity-max-profit-each-item-can-only-be-selected-once)
+  - [1.16. Topological Sort(directed graph)](#116-topological-sortdirected-graph)
+    - [1.16.1. Intro](#1161-intro)
+    - [1.16.2. Problems](#1162-problems)
+      - [1.16.2.1. Find if a given Directed Graph has a cycle or not](#11621-find-if-a-given-directed-graph-has-a-cycle-or-not)
+  - [1.17. Misc](#117-misc)
 
 
 ## 1.1. Sliding Window
@@ -736,11 +755,319 @@ ss([4, 6, 10], 6)
 #### 1.12.2.1. Given an array of n−1 integers in the range from 1 to n, find the one number that is missing from the array.
 - Input: 1, 5, 2, 6, 4
 Answer: 3
+- Remember the important property of XOR that it returns 0 if both the bits in comparison are the same. In other words, XOR of a number with itself will always result in 0. This means that if we XOR all the numbers in the input array with all numbers from the range 1 to n then each number in the input is going to get zeroed out except the missing number. 
+
+```
+def find_missing_number(arr):
+  n = len(arr) + 1
+  # x1 represents XOR of all values from 1 to n
+  x1 = 1
+  for i in range(2, n+1):
+    x1 = x1 ^ i
+
+  # x2 represents XOR of all values in arr
+  x2 = arr[0]
+  for i in range(1, n-1):
+    x2 = x2 ^ arr[i]
+  
+  # missing number is the xor of x1 and x2
+  return x1 ^ x2
+
+arr = [1, 5, 2, 6, 4] 
+print('Missing number is:' + str(find_missing_number(arr)))
+```
+```
+Taking XOR of a number with itself returns 0, e.g.,
+
+1 ^ 1 = 0
+29 ^ 29 = 0
+Taking XOR of a number with 0 returns the same number, e.g.,
+
+1 ^ 0 = 1
+31 ^ 0 = 31
+XOR is Associative & Commutative, which means:
+
+(a ^ b) ^ c = a ^ (b ^ c)
+a ^ b = b ^ a
+```
+#### 1.12.2.2. In a non-empty array of integers, every number appears twice except for one, find that single number.
+- Input: 1, 4, 2, 1, 3, 2, 3
+Output: 4
+- hashmap and traverse, If number is already present in HashMap, remove it.
+If number is not present in HashMap, add it.
+In the end, only number left in the HashMap is our required single number.
+- Recall the following two properties of XOR:
+
+It returns zero if we take XOR of two same numbers.
+It returns the same number if we XOR with zero.
+So we can XOR all the numbers in the input; duplicate numbers will zero out each other and we will be left with the single number.
+
+## 1.13. Top/Smallest/frequent K elements
+### 1.13.1. Intro
+- Think heap
+### 1.13.2. Problems
+#### 1.13.2.1. Given an unsorted array of numbers, find the ‘K’ largest numbers in it.
+- Input: [3, 1, 5, 12, 2, 11], K = 3
+Output: [5, 12, 11]
+```
+import heapq
+def ss(n, k):
+  ret = []
+  for i in range(k):
+    heapq.heappush(ret, n[i])
+  for j in range(k, len(n)):
+    if n[j] > ret[0]:
+      heapq.heapreplace(ret, n[j])
+  print(ret)
+ss([3,1,5,12,2,11], 3)
+```
+- max heap
+```
+import heapq
+def ss(n, k):
+  ret = []
+  kk = []
+  for i in range(len(n)):
+    heapq.heappush(ret, -n[i])
+  for j in range(k):
+    v = heapq.heappop(ret)
+    kk.append(-v)
+  print(kk)
+ss([3,1,5,12,2,11], 3)
+```
+#### 1.13.2.2. Given an unsorted array of numbers, find Kth smallest number in it.
+- Input: [1, 5, 12, 2, 11, 5], K = 3
+Output: 5
+Explanation: The 3rd smallest number is '5', as the first two smaller numbers are [1, 2].
+- Input: [1, 5, 12, 2, 11, 5], K = 4
+Output: 5
+Explanation: The 4th smallest number is '5', as the first three small numbers are [1, 2, 5].
+```
+from heapq import *
 
 
+def find_Kth_smallest_number(nums, k):
+  maxHeap = []
+  # put first k numbers in the max heap
+  for i in range(k):
+    heappush(maxHeap, -nums[i])
+
+  # go through the remaining numbers of the array, if the number from the array is smaller than the
+  # top(biggest) number of the heap, remove the top number from heap and add the number from array
+  for i in range(k, len(nums)):
+    if -nums[i] > maxHeap[0]:
+      heappop(maxHeap)
+      heappush(maxHeap, -nums[i])
+
+  # the root of the heap has the Kth smallest number
+  return -maxHeap[0]
+
+print("Kth smallest number is: " +
+      str(find_Kth_smallest_number([1, 5, 12, 2, 11, 5], 3)))
+
+# since there are two 5s in the input array, our 3rd and 4th smallest numbers should be a '5'
+print("Kth smallest number is: " +
+      str(find_Kth_smallest_number([1, 5, 12, 2, 11, 5], 4)))
+
+print("Kth smallest number is: " +
+      str(find_Kth_smallest_number([5, 12, 11, -1, 12], 3)))
 
 
-## 1.13. Misc
+```
+
+## 1.14. K-way Merge
+### 1.14.1. Intro
+- Problems with a list of sorted arrays
+- Whenever we are given ‘K’ sorted arrays, we can use a Heap to efficiently perform a sorted traversal of all the elements of all arrays. We can push the smallest (first) element of each sorted array in a Min Heap to get the overall minimum. While inserting elements to the Min Heap we keep track of which array the element came from. We can, then, remove the top element from the heap to get the smallest element and push the next element from the same array, to which this smallest element belonged, to the heap. We can repeat this process to make a sorted traversal of all elements.
+### 1.14.2. Problems
+#### 1.14.2.1. Given an array of ‘K’ sorted LinkedLists, merge them into one sorted list.
+- Input: L1=[2, 6, 8], L2=[3, 6, 7], L3=[1, 3, 4]
+Output: [1, 2, 3, 3, 4, 6, 6, 7, 8]
+- Input: L1=[5, 8, 9], L2=[1, 7]
+Output: [1, 5, 7, 8, 9]
+
+```
+from heapq import *
+
+
+class ListNode:
+  def __init__(self, value):
+    self.value = value
+    self.next = None
+
+
+def merge_lists(lists):
+  minHeap = []
+
+  # put the root of each list in the min heap
+  for root in lists:
+    if root is not None:
+      heappush(minHeap, root)
+
+  # take the smallest(top) element form the min-heap and add it to the result
+  # if the top element has a next element add it to the heap
+  resultHead, resultTail = None, None
+  while minHeap:
+    node = heappop(minHeap)
+    if resultHead is None:
+      resultHead = resultTail = node
+    else:
+      resultTail.next = node
+      resultTail = resultTail.next
+
+    if node.next is not None:
+      heappush(minHeap, node.next)
+
+  return resultHead
+
+
+l1 = ListNode(2)
+l1.next = ListNode(6)
+l1.next.next = ListNode(8)
+
+l2 = ListNode(3)
+l2.next = ListNode(6)
+l2.next.next = ListNode(7)
+
+l3 = ListNode(1)
+l3.next = ListNode(3)
+l3.next.next = ListNode(4)
+
+result = merge_lists([l1, l2, l3])
+print("Here are the elements form the merged list: ", end='')
+while result != None:
+  print(str(result.value) + " ", end='')
+  result = result.next
+```
+#### 1.14.2.2. Given ‘M’ sorted arrays, find the K’th smallest number among all the arrays.
+- Input: L1=[2, 6, 8], L2=[3, 6, 7], L3=[1, 3, 4], K=5
+Output: 4
+Explanation: The 5th smallest number among all the arrays is 4, this can be verified from 
+the merged list of all the arrays: [1, 2, 3, 3, 4, 6, 6, 7, 8]
+- We can start merging all the arrays, but instead of inserting numbers into a merged list, we will keep count to see how many elements have been inserted in the merged list. Once that count is equal to ‘K’, we have found our required number.
+
+A big difference from Merge K Sorted Lists is that in this problem, the input is a list of arrays compared to LinkedLists. This means that when we want to push the next number in the heap we need to know what the index of the current number in the current array was. To handle this, we will need to keep track of the array and the element indices.
+```
+def find_Kth_smallest(lists, k):
+  number = -1
+  # TODO: Write your code here
+  return number
+
+print("Kth smallest number is: " +
+      str(find_Kth_smallest([[2, 6, 8], [3, 6, 7], [1, 3, 4]], 5)))
+```
+
+## 1.15. Dynamic Programming - 0/1 Knapsack
+### 1.15.1. Intro
+- A technique for solving an optimization problem by breaking it down into simpler subproblems and utilizing the fact that the optimal solution to the overall problem depends upon the optimal solution to its subproblems.
+- Overlapping subproblems
+- If overall optimal solution can be constructed from optimal solutions of its subproblems.
+- Top down with memoization or bottom-up with tabulation
+### 1.15.2. Problems
+#### 1.15.2.1. N items, C capacity, max profit, each item can only be selected once
+- Given two integer arrays to represent weights and profits of ‘N’ items, we need to find a subset of these items which will give us maximum profit such that their cumulative weight is not more than a given number ‘C.’ Each item can only be selected once, which means either we put an item in the knapsack or we skip it.
+```
+def solve_knapsack(profits, weights, capacity):
+  def _recur(profits, weights, capacity, curr):
+    if capacity <= 0 or curr >= len(profits):
+      return 0
+    profit1 = 0
+    if weights[curr] <= capacity:
+      profit1 = profits[curr] + _recur(profits, weights, capacity - weights[curr], curr + 1)
+    profit2 = _recur(profits, weights, capacity, curr + 1)
+
+    return max(profit1, profit2)
+
+  return _recur(profits, weights, capacity, 0)
+
+
+print(solve_knapsack([1, 6, 10, 16], [1, 2, 3, 5], 6))
+print(solve_knapsack([1, 6, 10, 16], [1, 2, 3, 5], 5))
+print(solve_knapsack([1, 6, 10, 16], [1, 2, 3, 5], 7))
+```
+
+## 1.16. Topological Sort(directed graph)
+- Topological Sort of a directed graph (a graph with unidirectional edges) is a linear ordering of its vertices such that for every directed edge (U, V) from vertex U to vertex V, U comes before V in the ordering.
+- The basic idea behind the topological sort is to provide a partial ordering among the vertices of the graph such that if there is an edge from U to V then U≤V i.e., U comes before V in the ordering. Here are a few fundamental concepts related to topological sort:
+- Source: Any node that has no incoming edge and has only outgoing edges is called a source.
+
+Sink: Any node that has only incoming edges and no outgoing edge is called a sink.
+
+So, we can say that a topological ordering starts with one of the sources and ends at one of the sinks.
+
+A topological ordering is possible only when the graph has no directed cycles, i.e. if the graph is a Directed Acyclic Graph (DAG). If the graph has a cycle, some vertices will have cyclic dependencies which makes it impossible to find a linear ordering among vertices.
+- a. Initialization
+
+We will store the graph in Adjacency Lists, which means each parent vertex will have a list containing all of its children. We will do this using a HashMap where the ‘key’ will be the parent vertex number and the value will be a List containing children vertices.
+To find the sources, we will keep a HashMap to count the in-degrees i.e., count of incoming edges of each vertex. Any vertex with ‘0’ in-degree will be a source.
+b. Build the graph and find in-degrees of all vertices
+
+We will build the graph from the input and populate the in-degrees HashMap.
+c. Find all sources
+
+All vertices with ‘0’ in-degrees will be our sources and we will store them in a Queue.
+d. Sort
+
+For each source, do the following things:
+Add it to the sorted list.
+Get all of its children from the graph.
+Decrement the in-degree of each child by 1.
+If a child’s in-degree becomes ‘0’, add it to the sources Queue.
+Repeat step 1, until the source Queue is empty.
+```
+from collections import deque
+
+
+def topological_sort(vertices, edges):
+  sortedOrder = []
+  if vertices <= 0:
+    return sortedOrder
+
+  # a. Initialize the graph
+  inDegree = {i: 0 for i in range(vertices)}  # count of incoming edges
+  graph = {i: [] for i in range(vertices)}  # adjacency list graph
+
+  # b. Build the graph
+  for edge in edges:
+    parent, child = edge[0], edge[1]
+    graph[parent].append(child)  # put the child into it's parent's list
+    inDegree[child] += 1  # increment child's inDegree
+
+  # c. Find all sources i.e., all vertices with 0 in-degrees
+  sources = deque()
+  for key in inDegree:
+    if inDegree[key] == 0:
+      sources.append(key)
+
+  # d. For each source, add it to the sortedOrder and subtract one from all of its children's in-degrees
+  # if a child's in-degree becomes zero, add it to the sources queue
+  while sources:
+    vertex = sources.popleft()
+    sortedOrder.append(vertex)
+    for child in graph[vertex]:  # get the node's children to decrement their in-degrees
+      inDegree[child] -= 1
+      if inDegree[child] == 0:
+        sources.append(child)
+
+  # topological sort is not possible as the graph has a cycle
+  if len(sortedOrder) != vertices:
+    return []
+
+  return sortedOrder
+
+print("Topological sort: " +
+        str(topological_sort(4, [[3, 2], [3, 0], [2, 0], [2, 1]])))
+```
+### 1.16.1. Intro
+- Input: Vertices=4, Edges=[3, 2], [3, 0], [2, 0], [2, 1]
+Output: Following are the two valid topological sorts for the given graph:
+1) 3, 2, 0, 1
+2) 3, 2, 1, 0
+### 1.16.2. Problems
+#### 1.16.2.1. Find if a given Directed Graph has a cycle or not
+- if can't determine the topological ordering then it has a cycle
+
+## 1.17. Misc
 - list.append vs list + [new] vs list.extend()
 - The concatenation operator + is a binary infix operator which, when applied to lists, returns a new list containing all the elements of each of its two operands. The list.append() method is a mutator on list which appends its single object argument (in your specific example the list c) to the subject list. In your example this results in c appending a reference to itself (hence the infinite recursion).
 - heapsort with import heapq
