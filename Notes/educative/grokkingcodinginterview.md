@@ -77,6 +77,7 @@
     - [1.15.1. Intro](#1151-intro)
     - [1.15.2. Problems](#1152-problems)
       - [1.15.2.1. N items, C capacity, max profit, each item can only be selected once](#11521-n-items-c-capacity-max-profit-each-item-can-only-be-selected-once)
+      - [LC: Coin Change](#lc-coin-change)
   - [1.16. Topological Sort(directed graph)](#116-topological-sortdirected-graph)
     - [1.16.1. Intro](#1161-intro)
     - [1.16.2. Problems](#1162-problems)
@@ -985,6 +986,34 @@ print(solve_knapsack([1, 6, 10, 16], [1, 2, 3, 5], 6))
 print(solve_knapsack([1, 6, 10, 16], [1, 2, 3, 5], 5))
 print(solve_knapsack([1, 6, 10, 16], [1, 2, 3, 5], 7))
 ```
+#### LC: Coin Change
+- https://leetcode.com/problems/coin-change/
+- You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.
+
+Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.
+
+You may assume that you have an infinite number of each kind of coin.
+- Input: coins = [1,2,5], amount = 11
+Output: 3
+Explanation: 11 = 5 + 5 + 1
+- greedy, start from highest -> itself -> next highest, but doesn't yield fewest.
+- DFS backtracking, brute force decision tree N number, N options
+```
+def ss(n, tar):
+  def _recur(n, tar, memo):
+    if tar == 0:
+      return 0
+    if tar < 0:
+      return 0
+    for i in n:
+      print(1 + _recur(n, tar - i, memo))
+  _recur(n, 7, {})
+ss([1,2,5], 11)
+```
+7
+1 3 4 5
+6 4 3 2
+5 3 2 1
 
 ## 1.16. Topological Sort(directed graph)
 - Topological Sort of a directed graph (a graph with unidirectional edges) is a linear ordering of its vertices such that for every directed edge (U, V) from vertex U to vertex V, U comes before V in the ordering.
