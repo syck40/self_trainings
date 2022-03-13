@@ -2,10 +2,12 @@
   - [1. Clone Graph](#1-clone-graph)
   - [2. Coin Change](#2-coin-change)
   - [3. Target Sum](#3-target-sum)
+  - [4. Kth Smallest Element in a BST](#4-kth-smallest-element-in-a-bst)
 - [2. Solutions](#2-solutions)
   - [1. Clone Graph](#1-clone-graph-1)
   - [2. Coin Change](#2-coin-change-1)
   - [3. Target Sum](#3-target-sum-1)
+  - [4. Kth Smallest Element in a BST](#4-kth-smallest-element-in-a-bst-1)
 
 # 1. Blind list sorted by importance
 ## 1. Clone Graph
@@ -18,6 +20,7 @@ Output: [[2,4],[1,3],[2,4],[1,3]]
 
 ## 2. Coin Change
    - You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money. Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1. You may assume that you have an infinite number of each kind of coin.
+   - https://leetcode.com/problems/clone-graph/
 ```
 Input: coins = [1,2,5], amount = 11
 Output: 3
@@ -28,6 +31,7 @@ Explanation: 11 = 5 + 5 + 1
     You want to build an expression out of nums by adding one of the symbols '+' and '-' before each integer in nums and then concatenate all the integers.
     For example, if nums = [2, 1], you can add a '+' before 2 and a '-' before 1 and concatenate them to build the expression "+2-1".
     Return the number of different expressions that you can build, which evaluates to target.
+    - https://leetcode.com/problems/target-sum/
 ```
 Input: nums = [1,1,1,1,1], target = 3
 Output: 5
@@ -38,6 +42,15 @@ Explanation: There are 5 ways to assign symbols to make the sum of nums be targe
 +1 + 1 + 1 - 1 + 1 = 3
 +1 + 1 + 1 + 1 - 1 = 3
 ``` 
+## 4. Kth Smallest Element in a BST
+  - Given the root of a binary search tree, and an integer k, return the kth smallest value (1-indexed) of all the values of the nodes in the tree.
+  - https://leetcode.com/problems/kth-smallest-element-in-a-bst/
+  - https://www.youtube.com/watch?v=5LUXSvjmGCw&feature=youtu.be
+  - BST think sorted
+```
+Input: root = [3,1,4,null,2], k = 1
+Output: 1
+```
 
 <br />
 <br />
@@ -150,4 +163,37 @@ def ss(n, t, memo):
     return _recur(n, t, 0, memo)
 
 ss([1,1,1,1,1], 3, {})
+```
+
+## 4. Kth Smallest Element in a BST
+standard pre-order DFS
+```
+def ss(root):
+    ss = [root]
+    while ss:
+        val = ss.pop()
+        print(val.val)
+        if val.right:
+            ss.append(val.right)
+        if val.left:
+            ss.append(val.left)
+```
+iterative in-order travesal from root
+```
+def ss(root, k):
+    n = 0
+    stack = []
+    cur = root
+
+    while cur or stack:
+        while cur:
+            stack.append(cur)
+            cur = cur.left
+        cur = stack.pop()
+        n += 1
+        if n == k:
+            return cur.val
+        cur = cur.right
+
+ss([5,3,6,2,4,null,null,1], 3)
 ```
