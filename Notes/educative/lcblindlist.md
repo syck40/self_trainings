@@ -6,6 +6,8 @@
   - [5. Course Schedule](#5-course-schedule)
   - [6. Course Schedule II](#6-course-schedule-ii)
   - [7. All nodes distance K in Binary Tree](#7-all-nodes-distance-k-in-binary-tree)
+  - [8. Path Sum II](#8-path-sum-ii)
+  - [9. Path Sum III](#9-path-sum-iii)
 - [2. Solutions](#2-solutions)
   - [1. Clone Graph](#1-clone-graph-1)
   - [2. Coin Change](#2-coin-change-1)
@@ -14,6 +16,8 @@
   - [5. Course Schedule](#5-course-schedule-1)
   - [6. Course Schedule II](#6-course-schedule-ii-1)
   - [7. All nodes distance K in Binary Tree](#7-all-nodes-distance-k-in-binary-tree-1)
+  - [8. Path Sum II](#8-path-sum-ii-1)
+  - [9. Path Sum III](#9-path-sum-iii-1)
 
 # 1. Blind list sorted by importance
 ## 1. Clone Graph
@@ -103,8 +107,32 @@ Input: root = [3,5,1,6,2,0,8,null,null,7,4], target = 5, k = 2
 Output: [7,4,1]
 Explanation: The nodes that are a distance 2 from the target node (with value 5) have values 7, 4, and 1.
 ```
- 
-- 
+## 8. Path Sum II
+- Given the root of a binary tree and an integer targetSum, return all root-to-leaf paths where the sum of the node values in the path equals targetSum. Each path should be returned as a list of the node values, not node references.
+
+A root-to-leaf path is a path starting from the root and ending at any leaf node. A leaf is a node with no children.
+
+```
+Input: root = [5,4,8,11,null,13,4,7,2,null,null,5,1], targetSum = 22
+Output: [[5,4,11,2],[5,8,4,5]]
+Explanation: There are two paths whose sum equals targetSum:
+5 + 4 + 11 + 2 = 22
+5 + 8 + 4 + 5 = 22
+```
+## 9. Path Sum III
+- Given the root of a binary tree and an integer targetSum, return the number of paths where the sum of the values along the path equals targetSum.
+
+The path does not need to start or end at the root or a leaf, but it must go downwards (i.e., traveling only from parent nodes to child nodes).
+```
+Example 1:
+Input: root = [10,5,-3,3,2,null,11,3,-2,null,1], targetSum = 8
+Output: 3
+Explanation: The paths that sum to 8 are shown.
+Example 2:
+
+Input: root = [5,4,8,11,null,13,4,7,2,null,null,5,1], targetSum = 22
+Output: 3
+```
 <br />
 <br />
 <br />
@@ -388,4 +416,67 @@ class Solution:
         
 # Time complexity = O(n)
 # Space complexity = O(n)
+```
+## 8. Path Sum II
+```
+def pathSum(self, root: Optional[TreeNode], targetSum: int) -> List[List[int]]:
+    # init
+    res = []
+    
+    # find
+    self.dfs(root, targetSum, res, [])
+    
+    # return
+    return res
+    
+def dfs(self, root, targetSum, res, stack):
+    # corner cases
+    if not root:
+        return
+    
+    # check if leaf value match
+    if not root.left and not root.right and root.val == targetSum:
+        stack += [root.val]
+        res.append(stack)
+
+    # check remains at left subtree
+    self.dfs(root.left, targetSum-root.val, res, stack + [root.val])
+
+    # check remains at right subtree
+    self.dfs(root.right, targetSum-root.val, res, stack + [root.val])
+```
+## 9. Path Sum III
+```
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+	def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
+		# using hashmap (dict) and pre order traversal
+		# Time O(n), Space O(n)
+		freq = defaultdict(int)
+		freq[0] = 1
+		self.ct = 0
+
+		def dfs(node, cur_sum):
+			if not node:
+				return
+
+			cur_sum += node.val
+			temp = cur_sum - targetSum # the logic
+
+			if temp in freq:
+				self.ct += freq[temp]
+
+			freq[cur_sum] += 1
+
+			dfs(node.left, cur_sum)
+			dfs(node.right, cur_sum)
+			freq[cur_sum] -= 1 # decrease the freq since we have gone thru that path
+
+		dfs(root, 0)
+		return self.ct
 ```
