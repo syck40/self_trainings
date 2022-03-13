@@ -447,36 +447,29 @@ def dfs(self, root, targetSum, res, stack):
 ```
 ## 9. Path Sum III
 ```
-# Definition for a binary tree node.
-# class TreeNode:
-#     def __init__(self, val=0, left=None, right=None):
-#         self.val = val
-#         self.left = left
-#         self.right = right
-class Solution:
-	def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
-		# using hashmap (dict) and pre order traversal
-		# Time O(n), Space O(n)
-		freq = defaultdict(int)
-		freq[0] = 1
-		self.ct = 0
+Idea: Maintain prefix sums while doing dfs from root to leaf. If currentSum-prefixSum=targetSum, then we've found a path that has a value of target. If we encountered prefixSum n times, then we've found n such paths.
 
-		def dfs(node, cur_sum):
-			if not node:
-				return
+def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
 
-			cur_sum += node.val
-			temp = cur_sum - targetSum # the logic
+	# prefix sums encountered in current path
+	sums = defaultdict(int)
+	sums[0] = 1
 
-			if temp in freq:
-				self.ct += freq[temp]
+	def dfs(root, total):
+		count = 0
+		if root:
+			total += root.val
+			# Can remove sums[currSum-targetSum] prefixSums to get target
+			count = sums[total-targetSum]
 
-			freq[cur_sum] += 1
+			# Add value of this prefixSum
+			sums[total] += 1
+			# Explore children
+			count += dfs(root.left, total) + dfs(root.right, total)
+			# Remove value of this prefixSum (path's been explored)
+			sums[total] -= 1
 
-			dfs(node.left, cur_sum)
-			dfs(node.right, cur_sum)
-			freq[cur_sum] -= 1 # decrease the freq since we have gone thru that path
+		return count
 
-		dfs(root, 0)
-		return self.ct
+	return dfs(root, 0)
 ```
