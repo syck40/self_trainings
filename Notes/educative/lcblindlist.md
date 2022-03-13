@@ -3,11 +3,17 @@
   - [2. Coin Change](#2-coin-change)
   - [3. Target Sum](#3-target-sum)
   - [4. Kth Smallest Element in a BST](#4-kth-smallest-element-in-a-bst)
+  - [5. Course Schedule](#5-course-schedule)
+  - [6. Course Schedule II](#6-course-schedule-ii)
+  - [7. All nodes distance K in Binary Tree](#7-all-nodes-distance-k-in-binary-tree)
 - [2. Solutions](#2-solutions)
   - [1. Clone Graph](#1-clone-graph-1)
   - [2. Coin Change](#2-coin-change-1)
   - [3. Target Sum](#3-target-sum-1)
   - [4. Kth Smallest Element in a BST](#4-kth-smallest-element-in-a-bst-1)
+  - [5. Course Schedule](#5-course-schedule-1)
+  - [6. Course Schedule II](#6-course-schedule-ii-1)
+  - [7. All nodes distance K in Binary Tree](#7-all-nodes-distance-k-in-binary-tree-1)
 
 # 1. Blind list sorted by importance
 ## 1. Clone Graph
@@ -52,6 +58,53 @@ Input: root = [3,1,4,null,2], k = 1
 Output: 1
 ```
 
+## 5. Course Schedule
+- There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you must take course bi first if you want to take course ai.
+
+For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
+Return true if you can finish all courses. Otherwise, return false.
+- https://leetcode.com/problems/course-schedule/
+```
+Input: numCourses = 2, prerequisites = [[1,0]]
+Output: true
+Explanation: There are a total of 2 courses to take. 
+To take course 1 you should have finished course 0. So it is possible.
+
+Input: numCourses = 2, prerequisites = [[1,0],[0,1]]
+Output: false
+Explanation: There are a total of 2 courses to take. 
+To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
+```
+## 6. Course Schedule II
+- There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you must take course bi first if you want to take course ai.
+
+For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
+Return the ordering of courses you should take to finish all courses. If there are many valid answers, return any of them. If it is impossible to finish all courses, return an empty array.
+```
+Example 1:
+
+Input: numCourses = 2, prerequisites = [[1,0]]
+Output: [0,1]
+Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0. So the correct course order is [0,1].
+Example 2:
+
+Input: numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]
+Output: [0,2,1,3]
+Explanation: There are a total of 4 courses to take. To take course 3 you should have finished both courses 1 and 2. Both courses 1 and 2 should be taken after you finished course 0.
+So one correct course order is [0,1,2,3]. Another correct ordering is [0,2,1,3].
+```
+
+## 7. All nodes distance K in Binary Tree
+- Given the root of a binary tree, the value of a target node target, and an integer k, return an array of the values of all nodes that have a distance k from the target node.
+
+You can return the answer in any order.
+```
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], target = 5, k = 2
+Output: [7,4,1]
+Explanation: The nodes that are a distance 2 from the target node (with value 5) have values 7, 4, and 1.
+```
+ 
+- 
 <br />
 <br />
 <br />
@@ -196,4 +249,143 @@ def ss(root, k):
         cur = cur.right
 
 ss([5,3,6,2,4,null,null,1], 3)
+```
+
+## 5. Course Schedule
+- https://www.youtube.com/watch?v=EgI5nU9etnU&feature=youtu.be
+```
+class Solution(object):
+    def canFinish1(self, numCourses, prerequisites):
+        indegree = collections.defaultdict(int)
+        adj_list = collections.defaultdict(list)
+        for pre in prerequisites:
+            indegree[pre[0]] += 1
+            adj_list[pre[1]].append(pre[0])
+        starts, visited = [i for i in range(numCourses) if not indegree[i]], set()
+        while starts:
+            node = starts.pop()
+            if node in visited:
+                continue
+            visited.add(node)
+            for neigh in adj_list[node]:
+                indegree[neigh] -= 1
+                if not indegree[neigh]:
+                    starts.append(neigh)
+        return len(visited) == numCourses
+        
+    def canFinish2(self, numCourses, prerequisites):
+        indegree = collections.defaultdict(int)
+        adj_list = collections.defaultdict(list)
+        for pre in prerequisites:
+            indegree[pre[0]] += 1
+            adj_list[pre[1]].append(pre[0])
+        starts, visited = deque([i for i in range(numCourses) if not indegree[i]]), set()
+        while starts:
+            node = starts.popleft()
+            if node in visited:
+                continue
+            visited.add(node)
+            for neigh in adj_list[node]:
+                indegree[neigh] -= 1
+                if not indegree[neigh]:
+                    starts.append(neigh)
+        return len(visited) == numCourses
+    
+    def canFinish(self, numCourses, prerequisites):
+        indegree = collections.defaultdict(int)
+        adj_list = collections.defaultdict(list)
+        for pre in prerequisites:
+            indegree[pre[0]] += 1
+            adj_list[pre[1]].append(pre[0])
+        starts, visited = deque([i for i in range(numCourses) if not indegree[i]]), set()
+        for start in starts:
+            self.dfs(indegree, adj_list, start, visited)
+        return len(visited) == numCourses
+    
+    def dfs(self, indegree, adj_list, start, visited):
+        if start in visited:
+            return
+        visited.add(start)
+        for neigh in adj_list[start]:
+            indegree[neigh] -= 1
+            if not indegree[neigh]:
+                self.dfs(indegree, adj_list, neigh, visited)
+```
+## 6. Course Schedule II
+```
+class Solution:
+    def findOrder(self, numCourses: int, prerequisites: List[List[int]]) -> List[int]:
+        graph = collections.defaultdict(list)
+        for pair in prerequisites:
+            graph[pair[0]].append(pair[1])
+        
+        visited = set()
+        inProgress = set()
+        result = []
+        
+        def topologicalSort(course):
+            nonlocal visited, inProgress, graph, result
+            inProgress.add(course)
+            if course in graph:
+                for prereq in graph[course]:
+                    if prereq in inProgress:
+                        return False
+                    if prereq not in visited:
+                        status = topologicalSort(prereq)
+                        if not status:
+                            return False
+            
+            inProgress.remove(course)
+            visited.add(course)
+            result.append(course)
+            return True
+            
+        
+        for i in range(numCourses):
+            if i in visited:
+                continue
+            if not topologicalSort(i):
+                return []
+        
+        return result
+```
+## 7. All nodes distance K in Binary Tree
+```
+class Solution:
+    def distanceK(self, root: TreeNode, target: TreeNode, k: int) -> List[int]:
+        # Create a hash table to store each node's parent using DFS.
+        # Doing this will convert the problem to more of a graph problem.
+        hashtable = {}  
+        res = []
+        def dfs(node, parent):
+            if not node:
+                return
+            hashtable[node] = parent
+            dfs(node.left, node)
+            dfs(node.right, node)   
+            
+        dfs(root, None)    
+        
+        # Once we have an adacency list (hash table), run a simple bfs search like any other graph problem
+        q = deque([(target, 0)])
+        visit = set()
+        visit.add(target)
+        while q:
+            # Check if the leftmost value in queue has level == k. If so, return all values in q.
+            # We will only have one level of nodes in the queue at a time.
+            if q[0][1] == k:
+                for node, level in q:
+                    res.append(node.val)
+                return res
+            # BFS
+            node, level = q.popleft()
+            for nei in [node.left, node.right, hashtable[node]]:
+                if nei and nei not in visit:
+                    q.append((nei, level + 1))
+                    visit.add(nei)
+                    
+        return res
+        
+# Time complexity = O(n)
+# Space complexity = O(n)
 ```
