@@ -9,10 +9,14 @@
       - [1.1.5.1. Max Sum Subarray of Size K](#1151-max-sum-subarray-of-size-k)
       - [1.1.5.2. Smallest Subarray With a Greater Sum](#1152-smallest-subarray-with-a-greater-sum)
       - [1.1.5.3. Longest substring with no more than K distinct char](#1153-longest-substring-with-no-more-than-k-distinct-char)
+      - [Longest substring with distinct characters](#longest-substring-with-distinct-characters)
   - [1.2. Two Pointers](#12-two-pointers)
     - [1.2.1. Intro](#121-intro)
     - [1.2.2. Problems](#122-problems)
       - [1.2.2.1. Given an array of sorted numbers and a target sum, find a pair in the array whose sum is equal to the given target.](#1221-given-an-array-of-sorted-numbers-and-a-target-sum-find-a-pair-in-the-array-whose-sum-is-equal-to-the-given-target)
+      - [Given a sorted numbers in array, remove all duplicates](#given-a-sorted-numbers-in-array-remove-all-duplicates)
+      - [Pair with Target Sum](#pair-with-target-sum)
+      - [Triplet Sum to Zero](#triplet-sum-to-zero)
   - [1.3. Fast & Slow Pointers](#13-fast--slow-pointers)
     - [1.3.1. Intro](#131-intro)
     - [1.3.2. Problems](#132-problems)
@@ -27,6 +31,7 @@
     - [1.5.1. Intro](#151-intro)
     - [1.5.2. Problems](#152-problems)
       - [1.5.2.1. c_sort](#1521-c_sort)
+      - [1.5.2.2. Similar problems:](#1522-similar-problems)
   - [1.6. Reversal of LinkedList](#16-reversal-of-linkedlist)
     - [1.6.1. Intro](#161-intro)
     - [1.6.2. Problems](#162-problems)
@@ -37,6 +42,7 @@
     - [1.7.2. Problems](#172-problems)
       - [1.7.2.1. BFS](#1721-bfs)
       - [1.7.2.2. Zigzag BFS](#1722-zigzag-bfs)
+      - [1.7.2.3. Level Averages](#1723-level-averages)
   - [1.8. DFS](#18-dfs)
     - [1.8.1. Intro](#181-intro)
     - [1.8.2. Problems](#182-problems)
@@ -77,7 +83,7 @@
     - [1.15.1. Intro](#1151-intro)
     - [1.15.2. Problems](#1152-problems)
       - [1.15.2.1. N items, C capacity, max profit, each item can only be selected once](#11521-n-items-c-capacity-max-profit-each-item-can-only-be-selected-once)
-      - [LC: Coin Change](#lc-coin-change)
+      - [1.15.2.2. LC: Coin Change](#11522-lc-coin-change)
   - [1.16. Topological Sort(directed graph)](#116-topological-sortdirected-graph)
     - [1.16.1. Intro](#1161-intro)
     - [1.16.2. Problems](#1162-problems)
@@ -181,6 +187,46 @@ def bf(n, k):
     print(maxlength)
 bf("cbbebi", 2)
 ```
+
+#### Longest substring with distinct characters
+```
+Input: String="aabccbb"
+Output: 3
+Explanation: The longest substring with distinct characters is "abc".
+```
+```
+We can use a HashMap to remember the last index of each character we have processed. Whenever we get a duplicate character, we will shrink our sliding window to ensure that we always have distinct characters in the sliding window.
+```
+```
+def non_repeat_substring(str1):
+  window_start = 0
+  max_length = 0
+  char_index_map = {}
+
+  # try to extend the range [windowStart, windowEnd]
+  for window_end in range(len(str1)):
+    right_char = str1[window_end]
+    # if the map already contains the 'right_char', shrink the window from the beginning so that
+    # we have only one occurrence of 'right_char'
+    if right_char in char_index_map:
+      # this is tricky; in the current window, we will not have any 'right_char' after its previous index
+      # and if 'window_start' is already ahead of the last index of 'right_char', we'll keep 'window_start'
+      window_start = max(window_start, char_index_map[right_char] + 1)
+    # insert the 'right_char' into the map
+    char_index_map[right_char] = window_end
+    # remember the maximum length so far
+    max_length = max(max_length, window_end - window_start + 1)
+  return max_length
+
+
+def main():
+  print("Length of the longest substring: " + str(non_repeat_substring("aabccbb")))
+  print("Length of the longest substring: " + str(non_repeat_substring("abbbb")))
+  print("Length of the longest substring: " + str(non_repeat_substring("abccde")))
+
+
+main()
+```
 ## 1.2. Two Pointers
 ### 1.2.1. Intro
 sorted arrays or linkedlists vs non-sorted(sliding window)
@@ -207,7 +253,71 @@ def bf(n, t):
     print(ret)
 bf([1,2,3,4,6], 6)
 ```
+#### Given a sorted numbers in array, remove all duplicates
+- fast and slow ptrs, fast iterate entire arra, slow only advance if value is not the same as the curr fast one
+```
+def remove_duplicates(arr):
+  nnd = 1
+  i = 0
+  while i < len(arr):
+    if arr[nnd-1] != arr[i]:
+      print(arr)
+      arr[nnd] = arr[i]
+      print(arr)
+      nnd += 1
+      
+    i += 1
+  return nnd
 
+def main():
+  print(remove_duplicates([2, 3, 3, 3, 6, 9, 9]))
+  print(remove_duplicates([2, 2, 2, 11]))
+
+
+main()
+
+```
+#### Pair with Target Sum
+```
+Given an array of sorted numbers and a target sum, find a pair in the array whose sum is equal to the given target.
+```
+```
+Input: [1, 2, 3, 4, 6], target=6
+Output: [1, 3]
+Explanation: The numbers at index 1 and 3 add up to 6: 2+4=6
+```
+```
+def pair_with_targetsum(arr, target_sum):
+  left, right = 0, len(arr) - 1
+  while(left < right):
+    current_sum = arr[left] + arr[right]
+    if current_sum == target_sum:
+      return [left, right]
+
+    if target_sum > current_sum:
+      left += 1  # we need a pair with a bigger sum
+    else:
+      right -= 1  # we need a pair with a smaller sum
+  return [-1, -1]
+
+
+def main():
+  print(pair_with_targetsum([1, 2, 3, 4, 6], 6))
+  print(pair_with_targetsum([2, 5, 9, 11], 11))
+
+
+main()
+
+```
+#### Triplet Sum to Zero
+```
+Input: [-3, 0, 1, 2, -1, 1, -2]
+Output: [-3, 1, 2], [-2, 0, 2], [-2, 1, 1], [-1, 0, 1]
+Explanation: There are four unique triplets whose sum is equal to zero.
+```
+```
+
+```
 ## 1.3. Fast & Slow Pointers
 ### 1.3.1. Intro
 - Useful for cyclic linkedlist or array
@@ -365,6 +475,7 @@ ss([Interval(1,3), Interval(1,4),Interval(2,3),Interval(2,5),Interval(1,6)])
 ```
 ## 1.5. Cyclic Sort
 ### 1.5.1. Intro
+- Dealing with array of number in a given range but missing certain number, idea is to put each number at its correct place.
 - Unsorted, array of int, from 1 to n, can have duplicates.  Find all missing numbers
 - https://emre.me/categories/#coding-patterns
 - This approach is quite useful when dealing with numbers in a given range and asking to find the duplicates/missing ones etc.
@@ -390,7 +501,25 @@ def bf(n):
     print(n)
 bf([2, 6, 4, 3, 1, 5])
 ```
+```
+def cyclic_sort(nums):
+  # TODO: Write your code here
+  print(nums)
+  for i in range(len(nums)):
+    val = nums[i]
+    while val != i + 1:
+      tmp = nums[i]
+      nums[i] = nums[val-1]
+      nums[val-1] = tmp
+      val = nums[i]
+  print(nums)
+  
+  return nums
+```
 
+#### 1.5.2.2. Similar problems:
+- We are given an array containing n distinct numbers taken from the range 0 to n. Since the array has only n numbers out of the total n+1 numbers, find the missing number.
+- Find duplicate numbers
 ## 1.6. Reversal of LinkedList
 ### 1.6.1. Intro
 ### 1.6.2. Problems
@@ -448,49 +577,65 @@ def main():
   result.print_list()
 ```
 #### 1.6.2.2. Given the head of a LinkedList and two positions ‘p’ and ‘q’, reverse the LinkedList from position ‘p’ to ‘q’.
+```
+Skip the first p-1 nodes, to reach the node at position p.
+Remember the node at position p-1 to be used later to connect with the reversed sub-list.
+Next, reverse the nodes from p to q using the same approach discussed in Reverse a LinkedList.
+Connect the p-1 and q+1 nodes to the reversed sub-list.
 
+```
 ## 1.7. Tree Breadth First Search
 ### 1.7.1. Intro
 - Queue
 ### 1.7.2. Problems
 #### 1.7.2.1. BFS
+- length of the queue = the level of the tree
 ```
+from collections import deque
+
+
 class TreeNode:
   def __init__(self, val):
     self.val = val
     self.left, self.right = None, None
 
+
 def traverse(root):
   result = []
-  if root is None:
-    return result
   qq = [root]
   while qq:
-    lvl = len(qq)
-    sum = 0
-    for _ in range(lvl):
+    lvlSize = len(qq)
+    lvlArr = []
+    for _ in range(lvlSize):
       val = qq.pop(0)
-      sum += val.val
+      lvlArr.append(val.val)
       if val.left:
         qq.append(val.left)
       if val.right:
         qq.append(val.right)
-    result.append(sum / lvl)
-
+    result.append(lvlArr)
+  print(result)
   return result
 
 
-root = TreeNode(12)
-root.left = TreeNode(7)
-root.right = TreeNode(1)
-root.left.left = TreeNode(9)
-root.right.left = TreeNode(10)
-root.right.right = TreeNode(5)
-print("Level order traversal: " + str(traverse(root)))
+def main():
+  root = TreeNode(12)
+  root.left = TreeNode(7)
+  root.right = TreeNode(1)
+  root.left.left = TreeNode(9)
+  root.right.left = TreeNode(10)
+  root.right.right = TreeNode(5)
+  print("Level order traversal: " + str(traverse(root)))
+
+
+main()
+
 
 ```
 #### 1.7.2.2. Zigzag BFS
 - keep track of current level, queue size = current level if do a for loop for number of times == queue size
+#### 1.7.2.3. Level Averages
+- The only difference will be that instead of keeping track of all nodes of a level, we will only track the running sum of the values of all nodes in each level. In the end, we will append the average of the current level to the result array.
 
 ## 1.8. DFS
 ### 1.8.1. Intro
@@ -698,6 +843,24 @@ def find_permutations(nums):
 
   return result
 find_permutations([1, 3, 5])
+```
+```
+class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        if len(nums) == 1:
+            return [nums.copy()]
+        for i in range(len(nums)):
+            val = nums.pop(0)
+            perms = self.permute(nums)
+            print(perms)
+            for p in perms:
+                #print(p)
+                p.append(val)
+            res.extend(perms)
+            nums.append(val)
+        print(res)
+        return res
 ```
 ## 1.11. Binary Search
 ### 1.11.1. Intro
@@ -986,7 +1149,7 @@ print(solve_knapsack([1, 6, 10, 16], [1, 2, 3, 5], 6))
 print(solve_knapsack([1, 6, 10, 16], [1, 2, 3, 5], 5))
 print(solve_knapsack([1, 6, 10, 16], [1, 2, 3, 5], 7))
 ```
-#### LC: Coin Change
+#### 1.15.2.2. LC: Coin Change
 - https://leetcode.com/problems/coin-change/
 - You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.
 
