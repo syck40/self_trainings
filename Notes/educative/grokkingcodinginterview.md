@@ -1260,6 +1260,30 @@ Output: Following are the two valid topological sorts for the given graph:
 - if can't determine the topological ordering then it has a cycle
 
 ## 1.17. Misc
+- LCA, lowest common ancestor of 2 given nodes in the tree
+- 2sum
+- Anagram
+- LCS, longest consecutive sequence
+- Valid Palindrome(2ptrs)
+- LSU, longest substring without repeating characters(slidingwindows)
+- Permutation(slidingwindow)
+- Parentheses(stack on closing bracket)
+- LRU, hashmap backed by linked list
+- DFS recursive tree traversal, recur(node, comparison_value) have it return a count
+```
+def recur(node, v):
+  if not node:
+    return 0
+  res = 0
+  if node.val >= v:
+    res = 1
+  res += recur(n.left, max(node.val, v))
+  res += recur(n.right, max(node.val, v))
+  return res
+```
+- Trie, prefix tree
+- Python, string split, lower, ''.join(), {i:1 for i in j}, from collections import Counter, defaultdict(list), zip, startswith, heapq
+
 - list.append vs list + [new] vs list.extend()
 - The concatenation operator + is a binary infix operator which, when applied to lists, returns a new list containing all the elements of each of its two operands. The list.append() method is a mutator on list which appends its single object argument (in your specific example the list c) to the subject list. In your example this results in c appending a reference to itself (hence the infinite recursion).
 - heapsort with import heapq

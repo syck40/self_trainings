@@ -16,6 +16,10 @@
   - [1.15. 0/1 Knapsack](#115-01-knapsack)
   - [1.16. Valid parentheses](#116-valid-parentheses)
   - [1.17. LRU cache](#117-lru-cache)
+  - [1.18. Subsets](#118-subsets)
+  - [1.19. Combination Sum](#119-combination-sum)
+  - [1.20. Permutations](#120-permutations)
+  - [1.21. Number of Islands](#121-number-of-islands)
 - [2. Solutions](#2-solutions)
   - [2.1. Clone Graph](#21-clone-graph)
   - [2.2. Coin Change](#22-coin-change)
@@ -34,10 +38,15 @@
   - [2.15. 0/1 Knapsack](#215-01-knapsack)
   - [2.16. Valid parentheses](#216-valid-parentheses)
   - [2.17. LRU cache](#217-lru-cache)
+  - [2.18. Subsets](#218-subsets)
+  - [2.19. Combination Sum](#219-combination-sum)
+  - [2.20. Permutations](#220-permutations)
+  - [2.21. Number of Islands](#221-number-of-islands)
 
 # 1. Blind list sorted by importance
 ## 1.1. Clone Graph
    - Given a reference of a node in a connected undirected graph. Return a deep copy (clone) of the graph.
+   - Use a hashmap of old : new, when creating new node's neighbor list, run recursive and append 
 ```
 Input: adjList = [[2,4],[1,3],[2,4],[1,3]] 
 Output: [[2,4],[1,3],[2,4],[1,3]]
@@ -215,6 +224,35 @@ Output: true
 - Cache class has cap, cache dict, left and right pointing to dummy Node class
 - Put first check if key in cache, if so remove it from cache then set to new Node(value)
 - Removal opt for a doubly linked list, storing the prev and next of current node, them set prev.next = curr.next, nxt.prev = curr.prev
+- The key is always remove from linked list then add it back to the head for every retrival and resizing
+
+## 1.18. Subsets
+- https://leetcode.com/problems/subsets/
+- Backtracking, n^2, 1. create result list with empty list as item 1, then iterate each number, for each number append to the previous existing list and add back to result list immediately
+
+## 1.19. Combination Sum
+- https://leetcode.com/problems/combination-sum/
+```
+Input: candidates = [2,3,6,7], target = 7
+Output: [[2,2,3],[7]]
+Explanation:
+2 and 3 are candidates, and 2 + 2 + 3 = 7. Note that 2 can be used multiple times.
+7 is a candidate, and 7 = 7.
+These are the only two combinations.
+```
+- recursive with pointer and current and sum, each iteration 2 decision of taking the current value vs leaving it
+
+## 1.20. Permutations
+- https://leetcode.com/problems/permutations/
+- https://www.youtube.com/watch?v=xFv_Hl4B83A
+```
+Input: nums = [1,2,3]
+Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+```
+
+## 1.21. Number of Islands
+- https://leetcode.com/problems/number-of-islands/
+- 2D grids, BFS visit nearby nodes, keep a list of already visited in BFS func, this list become the land of island, only increment if its not in visited
 <br />
 <br />
 <br />
@@ -888,4 +926,51 @@ class LRUCache:
             self.remove(lru)
             print(lru in self.cache)
             del self.cache[lru.key]
+```
+## 2.18. Subsets
+```
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        ret = []
+        ret.append([])
+        for n in nums:
+            for j in range(len(ret)):
+                r1 = list(ret[j])
+                r1.append(n)
+                ret.append(r1)
+        print(ret)
+        return ret
+```
+## 2.19. Combination Sum
+## 2.20. Permutations
+## 2.21. Number of Islands
+```
+class Solution:
+    def numIslands(self, grid: List[List[str]]) -> int:
+        row, col = len(grid), len(grid[0])
+        visited = set()
+        count = 0
+        def dfs(r, c):
+            qq = [(r, c)]
+            directions = [(1,0), (-1,0), (0, 1), (0, -1)]
+            while qq:
+                rr, cc = qq.pop(0)
+                visited.add((rr, cc))
+                for dr, dc in directions:
+                    ddr = rr + dr
+                    ddc = cc + dc
+                    if ddr >= row or ddc >= col or ddr < 0 or ddc < 0:
+                        continue
+                    if grid[ddr][ddc] != "1" or (ddr, ddc) in visited:
+                        continue
+                    print((ddr, ddc))
+                    qq.append((ddr, ddc))
+                    visited.add((ddr, ddc))
+                    
+        for r in range(row):
+            for c in range(col):
+                if (r, c) not in visited and grid[r][c] == "1":
+                    dfs(r, c)
+                    count += 1
+        return count
 ```
