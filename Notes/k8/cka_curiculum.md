@@ -1,16 +1,16 @@
-- [1. Cluster Architecture, Installation & Configuration	25 %](#1-cluster-architecture-installation--configuration25-)
+- [1. Cluster Architecture, Installation & Configuration](#1-cluster-architecture-installation--configuration)
   - [1.1. Manage role-based Access Control (RBAC)](#11-manage-role-based-access-control-rbac)
   - [1.2. Use Kubeadm to Install a Basic Cluster](#12-use-kubeadm-to-install-a-basic-cluster)
-- [2. Workloads & Scheduling	15 %](#2-workloads--scheduling15-)
+- [2. Workloads & Scheduling](#2-workloads--scheduling)
   - [2.1. Workloads](#21-workloads)
   - [2.2. Scheduling](#22-scheduling)
-- [3. Services & Networking	20 %](#3-services--networking20-)
-- [4. Storage	10 %](#4-storage10-)
-- [5. Troubleshooting	30 %](#5-troubleshooting30-)
+- [3. Services & Networking](#3-services--networking)
+- [4. Storage](#4-storage)
+- [5. Troubleshooting](#5-troubleshooting)
 
 https://github.com/bmuschko/cka-study-guide
 
-# 1. Cluster Architecture, Installation & Configuration	25 %
+# 1. Cluster Architecture, Installation & Configuration
 ## 1.1. Manage role-based Access Control (RBAC)
 ```
 Create the ServiceAccount named api-access in a new namespace called apps.
@@ -29,7 +29,7 @@ Prerequisite: This exercise requires the installation of the tools Vagrant and V
 
 Navigate to the directory app-a/ch02/backup-restore-etcd of the checked-out GitHub repository bmuschko/cka-study-guide. Start up the VMs running the cluster using the command vagrant up. The cluster consists of a single control plane node named k8s-control-plane, and two worker nodes named worker-1, and worker-2. The etcdctl tool has been preinstalled on the node k8s-control-plane. Back up etcd to the snapshot file /opt/etcd.bak. Restore etcd from the snapshot file. Use the data directory /var/bak. Once done, shut down the cluster using vagrant destroy -f.
 ```
-# 2. Workloads & Scheduling	15 %
+# 2. Workloads & Scheduling
 ## 2.1. Workloads
 ```
 Create a Deployment named nginx that uses the image nginx:1.17.0. Set 2 replicas to begin with.
@@ -54,7 +54,7 @@ Modify the ConfigMap manifest by changing the value of the key dir to /etc/logs/
 
 Use Kustomize to set a common namespace t012 for the resource file pod.yaml. The file pod.yaml defines the Pod named nginx with the image nginx:1.21.1 without a namespace. Run the Kustomize command that renders the transformed manifest on the console.
 ```
-# 3. Services & Networking	20 %
+# 3. Services & Networking
 ```
 In the namespace external, create a Deployment named nginx with the image nginx for 3 replicas. The container should expose the port 80. Within the same namespace, create a Service of type LoadBalancer. The Service should route traffic to the Pods managed by the Deployment.
 
@@ -74,7 +74,7 @@ Create a rewrite rule for the CoreDNS configuration that allows referencing a Se
 
 Make a call to the nginx Service using wget or curl from a temporary Pod in a new namespace called hello with the appropriate hostname.
 ```
-# 4. Storage	10 %
+# 4. Storage
 ```
 Create a PersistentVolume named logs-pv that maps to the hostPath /tmp/logs. The access mode should be ReadWriteOnce and ReadOnlyMany. Provision a storage capacity of 2Gi. Assign the reclaim policy Delete and an empty string as the storage class. Ensure that the status of the PersistentVolume shows Available.
 
@@ -96,7 +96,7 @@ The PersistentVolume should have been provisioned dynamically. Find out the name
 
 Delete the PersistentVolumeClaim. What happens to the PersistentVolume?
 ```
-# 5. Troubleshooting	30 %
+# 5. Troubleshooting
 ```
 You are supposed to implement cluster-level logging with a sidecar container. Create a multi-container Pod named multi. The main application container named nginx should use the image nginx:1.21.6. The sidecar container named streaming uses the image busybox:1.35.0 and the arguments /bin/sh, -c, 'tail -n+1 -f /var/log/nginx/access.log'.
 
