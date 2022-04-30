@@ -107,3 +107,36 @@ spec:
 EOF
 ```
 - vim, :set shiftwidth=1, Ctrl V, jjj to mark lines, 5>
+- `kubectl set image deployment web-proj nginx=nginx:1.17 --record`
+- `kubectl rollout history deployment web-proj`
+- kube-controller-manager are static pods with yaml in /etc/kubernetes/manifests/etcd.yaml|kube-apiserver.yaml|kube-controller-manager.yaml|kube-scheduler.yaml
+- user and group are not api resources, unlike service accounts which are used by processes.
+- 3 ways of authentication -> x509/basic/bearer openID
+- openssl x509 -req -in johndoe.csr -CA /etc/kubernetes/pki/ca.crt -CAkey \
+/etc/kubernetes/pki/ca.key -CAcreateserial -out johndoe.crt -days 364
+- clusterRole aggregationRule
+- `kubectl set img deploy ng *=nginx:1.17` will trigger new deployment rollout history
+- `kubectl rollout history deploy ng --revision=5` will show what changed
+- `kubectl set env deploy ng --all env=prod` will also trigger new deployemnt rollout
+- The option --from-env-file expects a file that contains environment variables in the format KEY=value separated by a new line. The key-value pairs follow typical naming conventions for environment variables e.g. the key is upper-cased, and individual words are separated by an underscore character.
+- svc with label selector automatically create endpoints that points to pods, endpoint can be created manually with the same name as selectorless svc that points to an external static ip
+- When container images are instantiated as containers, the container needs context - context to CPU, memory, and I/O resources. Pods provide the network and filesystem context for the containers within. The network is provided as the Pod’s virtual IP and the file system is mounted to the hosting node’s filesystem. Applications running in the container can interact with the file system as part of the Pod context. A container’s temporary filesystem is isolated from any other container or Pod and is not persisted beyond a Pod restart. 
+- A Volume is a Kubernetes capability that persists data beyond a Pod restart. Essentially, a Volume is a directory that’s shareable between multiple containers of a Pod.
+- Persistent Volumes are a specific category of the wider concept of Volumes.  The Persistent Volume is the resource that actually persists the data to an underlying physical storage. The Persistent Volume Claim represents the connecting resource between a Pod and a Persistent Volume responsible for requesting the storage. Finally, the Pod needs to claim the Persistent Volume and mount it to a directory path available to the containers running inside of the Pod.
+- When you run kubectl logs, the kubelet receives the request, reads directly from the log file on the node, and returns the content to the client. The kubectl logs command only returns the latest log content, not the log entries that have already been archived.
+- For system components that do not run in the container e.g. the kubelet and the container runtime, logs will be written to journald if systemd is available. If systemd is not available, system components write their log files to the directory /var/log with the file extension .log.
+- .vimrc
+```
+set expandtab
+set tabstop=2
+set shiftwidth=2
+
+expandtab: use spaces for tab
+tabstop: amount of spaces used for tab
+shiftwidth: amount of spaces used during indentation
+```
+- misc:
+  - `usermod -aG wheel student`
+- doc searches
+  - kubeadm init -> creating a cluster
+  - pv -> configure a pod to use... docs/tasks
