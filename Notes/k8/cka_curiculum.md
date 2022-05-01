@@ -20,6 +20,8 @@ Create a ClusterRole with the name api-clusterrole, and the ClusterRoleBinding n
 Create a Pod named operator with the image nginx:1.21.1 in the namespace apps. Expose the container port 80. Assign the ServiceAccount api-access to the Pod. Create another Pod named disposable with the image nginx:1.21.1 in the namespace rm. Do not assign the ServiceAccount to the Pod.
 
 Open an interactive shell to the Pod named operator. Use the command line tool curl to make an API call to list the Pods in the namespace rm. What response do you expect? Use the command line tool curl to make an API call to delete the Pod disposable in the namespace rm. Does the response differ from the first call? You can find information about how to interact with Pods using the API via HTTP in the reference guide.
+
+get token from sa secret decode it, the send it with curl, curl -k -H "Authorization: Bearer $token" https://2881EDE9768CB6CE88F8D1618CA8C6B7.yl4.us-east-1.eks.amazonaws.com/api/v1/namespaces/rm/pods
 ```
 ## 1.2. Use Kubeadm to Install a Basic Cluster
 ```
