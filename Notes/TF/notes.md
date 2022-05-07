@@ -186,6 +186,25 @@ variable "cidr_subnet" {
 - tf enterprise, postgres/s3
 - tf local workspace vs cloud workspace
 - tf run triggers, a way to connect workspaces to other workspaces
+- sentinel, paid package in team/governance tier
+- sentinel activate between plan and apply
 
+# reviews
+- core workflow: https://www.terraform.io/intro/core-workflow#the-core-workflow-enhanced-by-terraform-cloud
+- sentinel: Inspect your previous list of runs, download a sentinel mock file and then import a mock
 
+From previous runs you can download sentinel mock files.  Mock files have to be written by hand, so its not possible for Terraform Cloud to just write your tests for you.
+- file provisioner
+- module publish visibility
+- terraform login api token where
+- null resource
+- terraform init will create dep, download plugin, create .terraform directory, NOT create state file
+- terraform apply -replace = taint, only 1 at a time
+- terraform plan -refresh-only: update the Terraform state and any root module output values to match changes made to remote objects outside of Terraform. 
+- When run without a saved plan file, terraform apply supports all of terraform plan's planning modes and planning options. For details, see:
+```
+-replace=ADDRESS - Instructs Terraform to plan to replace the single resource instance with the given address. If the given instance would normally have caused only an "update" action, or no action at all, then Terraform will choose a "replace" action instead.
 
+You can use this option if you have learned that a particular remote object has become degraded in some way. If you are using immutable infrastructure patterns then you may wish to respond to that by replacing the malfunctioning object with a new object that has the same configuration.
+```
+- All modules will be publicly available on the Internet without signing up or logging in. There is no option to make them private.
