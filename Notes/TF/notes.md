@@ -189,7 +189,7 @@ variable "cidr_subnet" {
 - sentinel, paid package in team/governance tier
 - sentinel activate between plan and apply
 
-# reviews
+# mock examples
 - core workflow: https://www.terraform.io/intro/core-workflow#the-core-workflow-enhanced-by-terraform-cloud
 - sentinel: Inspect your previous list of runs, download a sentinel mock file and then import a mock
 
@@ -208,3 +208,28 @@ From previous runs you can download sentinel mock files.  Mock files have to be 
 You can use this option if you have learned that a particular remote object has become degraded in some way. If you are using immutable infrastructure patterns then you may wish to respond to that by replacing the malfunctioning object with a new object that has the same configuration.
 ```
 - All modules will be publicly available on the Internet without signing up or logging in. There is no option to make them private.
+- default concurrent for apply is 10
+- enhanced backend can store and exec(local, tf cloud), standard can only store(s3 + local)
+- module source
+  
+# review topics
+- terraform apply -refresh-only, refresh state file if resource has changed outside of tf
+- terraform plan -refresh-only
+- terraform apply -replace= / taint, recreate even if no config has changed
+- terraform plan -replace= / taint
+- terraform state mv, Moving resources is useful when you want to combine modules or resources from other states, but do not want to destroy and recreate the infrastructure.
+- The terraform refresh command updates the state file when physical resources change outside of the Terraform workflow.
+- .terraform.lock.hcl
+- init crate lockfile and download providers not statefile
+- provisioner uses "self" object to refer the resource itself
+- provisioner.when = destroy, provisioner.command = "echo $hi", provisioner.on_failure = continue/fail
+- terraform init -> .terraform/providers/registry.terraform.io/hashicorp/aws/4.13.0/linux/bin
+  -  -> .terraform.lock.hcl
+- terraform workspace new dev -> .terraform.tfstate.d/
+- .terraform.lock.hcl from init, .terraform/provider/...
+- tf apply -> terraform.tfstate and terraform.tfstate.backup
+- tf workspace new dev -> terraform.tfstate.d/dev/terraform.tfstate
+- module search, name/provider/description, only verified ones will be listed
+- Terraform Registry, most version control systems, HTTP URLs, and Terraform Cloud or Terraform Enterprise private module registries.
+- terraform plan modes: destroy/refresh-only
+- terraform init -backend-config=config.consul.tfbackend, kv of backend config
