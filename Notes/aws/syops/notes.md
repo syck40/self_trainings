@@ -18,29 +18,34 @@
   - [4.3. automation](#43-automation)
 - [5. Security](#5-security)
   - [5.1. permission evaluation](#51-permission-evaluation)
-  - [enforcing data classification](#enforcing-data-classification)
-  - [encrption](#encrption)
-  - [ssl](#ssl)
-  - [secrets](#secrets)
-  - [reports and findings](#reports-and-findings)
+  - [5.2. enforcing data classification](#52-enforcing-data-classification)
+  - [5.3. encrption](#53-encrption)
+  - [5.4. ssl](#54-ssl)
+  - [5.5. secrets](#55-secrets)
+  - [5.6. reports and findings](#56-reports-and-findings)
 - [6. Networking](#6-networking)
-  - [network](#network)
-  - [waf](#waf)
-  - [r53](#r53)
-  - [cdn](#cdn)
-  - [troubleshooting](#troubleshooting)
-- [7. Cost](#7-cost)
+  - [6.1. network](#61-network)
+  - [6.2. waf](#62-waf)
+  - [6.3. r53](#63-r53)
+  - [6.4. cdn](#64-cdn)
+  - [6.5. troubleshooting](#65-troubleshooting)
+- [7. Cost (15 - 16)](#7-cost-15---16)
+  - [7.1. Performance optimization](#71-performance-optimization)
 
 ```
 55 questions
 170 min
 20 min per lab
+well-architected labs
 ```
 # 1. misc
 - aws --generate-cli-skeleton > file.json, aws --cli-input-json file.json
 - aws --query is clientside --filter is serverside
 
 # 2. Monitoring/Logging/Remediation
+- Introduction to DevOps on AWS(white paper)
+- PerformanceEfficiency Pillar - AWS Well-Architected Framework
+- Cloudwatch documentation
 ## 2.1. logs
 - cloudwatch logs, region scoped replicated through region, fault tolerant, durable
 - request service/feature to push, not pulled
@@ -89,6 +94,9 @@
 - manual or automated remediation, aws ssm automation document
 
 # 3. Reliability (5 - 7)
+- Reliability Pillar - Well-Architected Framework
+- Disaster Recovery of Workloads on AWS - whitepaper
+- aws backup documentation
 - scalability, increase resource, not necessarily automation
 - elasticity, increase AND decrease, alway automated
 - scaling plan(avail, balanced, cost)
@@ -198,6 +206,10 @@
   - already scaled out to full load and configured DNS
   - execution: DNS failover
 # 4. Deployment/Automation (8 - 9)
+- Operational Excellence Pillar - Well-Architected Framework
+- Overview of Deployment options on aws - whitepaper
+- Blue/Green Deployment - whitepaper
+- Cloudformation documentation
 - Create AMI:
 - Option 1: aws ec2 create-image --description --instance-id --name --no-reboot
 - Option 2: aws backup, need vault, plan
@@ -253,6 +265,9 @@
     - trigger type on change
     - parameter
 # 5. Security
+- security pillar - WA
+- aws governance at scale - whitepaper
+- aws security incident response guide - training guide
 ## 5.1. permission evaluation
 - action -> permission evaluation engine
   - principal wants to perform action, 
@@ -298,7 +313,7 @@
   - EXPOSED ACCESS KEYS: check github
   - IAM KEY ROTATION
 - accounts for function or teams, root account should have no resources, shared OU
-## enforcing data classification
+## 5.2. enforcing data classification
 - aws config, passive service, create rules genrate dashboard to show in-compliance
 - eventbridge, custom options
 - security hub -> reports
@@ -308,7 +323,7 @@
 - s3 lifecycle rules, multiple rules.
   - archive 30 days, delete after 1 year, everything in bucket, transition to glacier in 30 days,
   - delete rule(expire) after 1 year
-## encrption
+## 5.3. encrption
 - kms, region scope, multi-tenant, generate/store master key/upload/generate key pairs/ generate data keys.  does NOT encrypt data, does not store data key
 - CMK key policy, default no root access, user/role/account/policies
 - key admin, crud key material, delete key
@@ -329,7 +344,7 @@
   - cmk key admin permission, choose iam user and roles who can administer this key through api
   - define key usage permission, choose iam user and roles who can use
   - get key id.  aws kms enable-key-rotation --key-id --region
-## ssl
+## 5.4. ssl
 - cloudfront, allow tls or custom tls
 - custom tls on api gateway, gw must have dns cname records listed in the config for tls
 - alb allows 25 certs, classic/network support 1 tls cert, gateway lb operate at layer 3 and has no listener
@@ -338,14 +353,14 @@
 - region scoped, provision ssl certs, upload custom cert, cloudfront/elb/apigateway
 - manage renewal
 - s3 in-transit encrption
-## secrets
+## 5.5. secrets
 - secrets manager, region scoped, multi-region secrets, 65kb data, versioned, iam policies, resource-based policies, kms for at-rest encrption, use x-service, use with dbs for rotation
 - aurora, rds, sql server, documentdb, redshift
   - sm uses kms for encryption with default cmk or create own
   - create secret and specify kmks cmk to be used
   - grant permissions to the secret by creating iam policies/roles for access
 - ssm parameter store, 4k data up to 8kb, optional encryption, no native intergration with rds
-## reports and findings
+## 5.6. reports and findings
 - security hub, central view of security alerts
   - guardduty findings to aws detective for remediation
   - inspector
@@ -363,7 +378,11 @@
 - inspector targets
 - inspector schedule
 # 6. Networking
-## network
+- hybrid connectivity - whitepaper
+- building a scalable and secure muti-vpc aws network achitecture - whitepaper
+- amazon vpc connectivity option - whitepaper
+- r53 documentation
+## 6.1. network
 - public subnet, igw
 - private subnet, nat gw
 - no internet access, only through vpn
@@ -392,7 +411,7 @@
 - Interface endpoints route outbound to aws services and to privateLink(other customer private endpoints via private network) offerings
 - GateWay LoadBalancer endpoint traffic to a gwlb in a seperate vpc, centralize egress vpc
 - Transit gateway attachment, route to TG within same region
-## waf
+## 6.2. waf
 - can be global or region
 - stateful inspection of requests
 - count/allow/block
@@ -408,7 +427,7 @@
   - choose cf(global) or regional
   - add rules, managed rules, add to web acl
   - pushed to cloudwatch
-## r53
+## 6.3. r53
 - hosted zone, optionally register domain, public zone(internet) or private zone(associate with vpc, vpc needs enableDnsHostnames and enableDnsSupport)
 - records:
   - name
@@ -455,7 +474,7 @@
   - configure on-prem dns to forward requests to endpoint across vpn/dx
   - create outbound endpoint and associate with domains and on-prem dns across vpn/dx
   - ensure on-prem dns allow forwarded requests from endpoint
-## cdn
+## 6.4. cdn
 - cf, global scope, stored in edge location, multiple origin types
 - can use any internet accesible endpoint as origin, alb,ec2,external,s3,api gateway,elemental mediaStore
   - add origin, origin group
@@ -486,7 +505,7 @@
 - s3 static website, only GET and HEAD requests, bucket name must match cname fqdn
 - configure s3 block public access either through object acl or bucket policy for public read
 - inbound resolver is for vpc accepting non-vpc requests
-## troubleshooting
+## 6.5. troubleshooting
 - if src and dest in same subnet, sg issue
 - if src and dest in diff subnet, sg and nacl issue
 - if src and dest in diff vpc, sg and nacl and routing due to vpc peering
@@ -502,4 +521,97 @@
 - aws iam put-role-policy --role-name flow-logs-test --policy-name flow-logs-policy --policy-document policy.json
 - aws logs create-log-group --log-group-name ab
 - cloudfront s3 should use s3-website-region url instead of s3 api url endpoint
-# 7. Cost
+- cf distribution cname values, r53 cname records need to match, change distro cname
+- cf distro 2 cname value, certificate hostname needs to match cname value
+
+# 7. Cost (15 - 16)
+- cost optimization pillar - aws WA
+- laying down the foundation: setting up your env for cost optimization white paper
+- right sizing: provisioning instances to match workloads - whitepaper
+- cost allocation tags, 
+- aws:createdBy: root/iamuser/assumed/, only visible in billing/cost management console
+- aws-generated tag support: autoscaling/backup/batch/cloudformation/ec2/ecs/eks/elastic mapreduce/ssm
+- use with existing tag, can't use aws:, activate in billing console
+- billing -> cost allocating tag -> aws-generated
+- activate tag on bill/cost explorer
+- trusted advisor: premium checks
+  - ec2 reserved isntances
+  - low util ec2
+  - idle lb, classic lb
+  - ebs unattached
+  - unassociated eip
+  - rds idle db
+  - r53 latency resource record sets only has 1 record in a region
+  - ec2 reserved lease expiration
+  - underutil redshift
+  - savings plan
+  - elasticcache/rds/elasticsearch/redshift reservation
+- compute optimizer
+  - tool you deploy with cloudformation
+  - single account
+  - analyze compute resources
+  - 30 hours metrics min
+  - ec2/asg,ebs,lambda
+- cost explorer
+  - 24 month window billing console
+- budgets
+  - monitor cost
+  - some active actions
+  - cost budgets, name, dates(recurring), cost amount, filter, threshold, notification(email/sns/chatbot), actions(iam, scp ec2/rds action)
+  - usage budget type
+  - budget actions: apply iam policy to user/group/roles, stop ec2/rds
+  - billing alarm in us-east-1, aws cloudwatch put-metricalarm --name --metric-name --namespace --static --period 21600
+- budget creation
+  - cost budget
+  - fix or monthly budget
+  - filter by tag/services
+  - threshold, actual or forecasted cost
+  - actions
+- monitoring and recommendations
+  - cloudwatch
+  - ec2 optimizer
+  - trusted advisor
+  - cost management rightsizing recommendations
+- cost budget greater granilarity than aws billing alarm
+## 7.1. Performance optimization
+- ec2 types
+  - a, m, mac, t ( general )
+  - c (compute)
+  - r, x, u, z ( memory ) 24 terrabyte ram
+  - i, d, h ( storage ) optimized for ebs or instance storage
+  - p, Inf1, f, g ( accelerated )
+  - a ( amd )
+- recommandation trusted advisor/compute optimizer/cost management console
+- default metrics: cpu/networkin&out/cpucreditusage.
+- cloudwatch agent custom metrics: cpu_usage_user,mem_used_percent,processes_running,netstat_tcp_established
+- aws cloudwatch get-metric-statistic --metric-name CPUUtilization --namespace AWS/EC2 --start-time --end-time --period --query --output
+- ebs volumes
+  - ssd: gp2/gp3, iops bound, smaller reads and writes
+  - ssd provisioned ios: io1/io2, not only ios bound but also throughput bound
+  - hdd, throughput bound, large blocks of reads and writes, st1 and sc1
+- default cw metrics: volumewriteops,volumeidletime,volumequeuelenght,burstbalance
+- custom: disk_used_percent, diskio_read_time, diskio_write_byte, diskio_write_time
+- aws ec2 create-volume, attach-volume, modify-volume, need to os extend filesystem
+- s3 download performance
+  - aws configure set default.s3.max_concurrent_requests 20 for cp large amount
+  - byte ranges fetches are usually 8-16mb, select range.
+  - multipart upload or aws s3api create-multipart-upload, upload-part --body foo.001, complete-multipart-upload 
+- s3 transfer acceleration
+  - endpiont to global scope s3-accelerate.amazonaws.com, edge location, more cost, twice throughput
+- rds performance
+  - cloudwatch default: cpu/mem/disk/network/db connection
+  - enhanced metric from os point of view, stored in cloudwatch logs only, only way to view performance of both primary and standby in multi-az deployment, process list as well.
+  - sql server is diff metrics, running on windows
+  - performance insights: db load, top sql, wait events, max cpu, pushed to cw
+- rds recommendations:
+  - rds dashboard, instance config, huge page
+- ec2 network
+  - ENI, max 25gbps, atomic resource in same az, instance type are limited to much lower throughput
+  - ENAdaptor, only types ends with "n", max throughput 100gbps, requires enhanced networking to be enabled on instance, some are bare metal, many uses Nitro virtualization
+  - EFA, elastic fabric adaptor, 2 largest instance type, rather than throughput, it reduces latency as low as 15.5 microseconds, ENA with added capabilities and benefit from cluster placement groups
+  - enhanced networking, many current AMI has it default, change to kernel driver, uses single root I/O virtualization, reduce steps it takes to reach underlying network interface.  Higher bandwidth/pps/lower latency/jitter reduce
+  - ec2 placement groups, placement within the region, single or mutil az
+  - 3 types: cluster placement group, best effort placement for highest throughput, not designed for resilience, same rack
+  - partition placement group, partition = racks, can span multiple az
+  - spread placement group, garenteeed to be seperate az
+  - 
