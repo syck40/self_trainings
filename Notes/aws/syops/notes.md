@@ -1,32 +1,47 @@
-- [misc](#misc)
-- [1. Monitoring/Logging/Remediation](#1-monitoringloggingremediation)
-  - [logs](#logs)
-  - [alarms](#alarms)
-  - [notification](#notification)
-  - [remediation](#remediation)
-  - [eventbridge](#eventbridge)
-  - [aws config](#aws-config)
-- [2. Reliability (5 - 7)](#2-reliability-5---7)
-  - [caching](#caching)
-  - [rds](#rds)
-  - [loose coupling](#loose-coupling)
-    - [r53 routing](#r53-routing)
-- [3. Deployment/Automation](#3-deploymentautomation)
-- [4. Security](#4-security)
-- [5. Networking](#5-networking)
-- [6. Cost](#6-cost)
+- [1. misc](#1-misc)
+- [2. Monitoring/Logging/Remediation](#2-monitoringloggingremediation)
+  - [2.1. logs](#21-logs)
+  - [2.2. alarms](#22-alarms)
+  - [2.3. notification](#23-notification)
+  - [2.4. remediation](#24-remediation)
+  - [2.5. eventbridge](#25-eventbridge)
+  - [2.6. aws config](#26-aws-config)
+- [3. Reliability (5 - 7)](#3-reliability-5---7)
+  - [3.1. caching](#31-caching)
+  - [3.2. rds](#32-rds)
+  - [3.3. loose coupling](#33-loose-coupling)
+    - [3.3.1. r53 routing](#331-r53-routing)
+    - [3.3.2. backup and restore](#332-backup-and-restore)
+- [4. Deployment/Automation (8 - 9)](#4-deploymentautomation-8---9)
+  - [4.1. cloudformation](#41-cloudformation)
+  - [4.2. updating](#42-updating)
+  - [4.3. automation](#43-automation)
+- [5. Security](#5-security)
+  - [5.1. permission evaluation](#51-permission-evaluation)
+  - [enforcing data classification](#enforcing-data-classification)
+  - [encrption](#encrption)
+  - [ssl](#ssl)
+  - [secrets](#secrets)
+  - [reports and findings](#reports-and-findings)
+- [6. Networking](#6-networking)
+  - [network](#network)
+  - [waf](#waf)
+  - [r53](#r53)
+  - [cdn](#cdn)
+  - [troubleshooting](#troubleshooting)
+- [7. Cost](#7-cost)
 
 ```
 55 questions
 170 min
 20 min per lab
 ```
-# misc
+# 1. misc
 - aws --generate-cli-skeleton > file.json, aws --cli-input-json file.json
 - aws --query is clientside --filter is serverside
 
-# 1. Monitoring/Logging/Remediation
-## logs
+# 2. Monitoring/Logging/Remediation
+## 2.1. logs
 - cloudwatch logs, region scoped replicated through region, fault tolerant, durable
 - request service/feature to push, not pulled
 - need log groups, log groups -> log streams -> log records
@@ -40,14 +55,14 @@
 - cwl to firehose, iam trust identify cwl as principle and write permission to firehose
 - cwl agent for custom metrics, need iam and connectivity to cw endpoint via interfaace endpoint or internet
 - aws ssm send-command --document-name "" --targets [{key:value}] --parameters '{'action': 'install', 'name':'AmazonCloudWatchAgent'}'
-## alarms
+## 2.2. alarms
 - period: length of time to evaluate , 1 metric data point
 - evaluation period, number of data points to evaluate when determining
 - datapoints to alarm: number of data points within evaluation that must be breaching to cause alarm, does not have to be consecutive.
 - evaluation range: number of points retrived by cw for alrm evaluation
 - missing can be configured as missing/notbreaching/breaching/ignore
 - actions: sns/ec2 actions/auto scaling/ssm opsitem
-## notification
+## 2.3. notification
 - sns forward to http/httpsendpoint(jira)
 - email
 - kinesis data firehose
@@ -55,25 +70,25 @@
 - lambda
 - mobile push
 - sms
-## remediation
+## 2.4. remediation
 - ec2 action, any metric
 - statuscheckfailed_system only -> ec2 action recover will attempt to move
 - sns topic can trigger custom endpoint, api->lambda, lambda
 - ec2 status check: system reachability(host os)/instance reachability(guest os)
 - ebs volume status
 - rds db instance status
-## eventbridge
+## 2.5. eventbridge
 - used to call cloudwatch events, region scoped, default eventbus or custom eventbus
 - src and target, able to replay or DLQ queue for when failed
 - src can be  cloudtrail api/guardduty/service health events/scheduled/custom events.
 - filter match property -> forward to apigateway/ec2action/lambda/sns
-## aws config
+## 2.6. aws config
 - region scope, config streams, partial coverage
 - capture config changes, create snapshots
 - aws config rules: create lambda custom rule for evaluation or aws-managed rules to remediation
 - manual or automated remediation, aws ssm automation document
 
-# 2. Reliability (5 - 7)
+# 3. Reliability (5 - 7)
 - scalability, increase resource, not necessarily automation
 - elasticity, increase AND decrease, alway automated
 - scaling plan(avail, balanced, cost)
@@ -82,14 +97,14 @@
 - predictive scaling mode: forcase only(ml model) or forecase and scale(create action)
 - pre-launch instances
 - max-cap
-## caching
+## 3.1. caching
 - cloudfront, elb/s3 can use caching with cloudfront
 - cf, global scoped, deployed at edge location not region, cache both reads and writes.
 - elastic-cache, memcached or redis for traffic spike in same az
 - dynamodb, true kv store
 - memcached, az scoped, memory, volatile, all endpoint writable
 - redis, while az scoped, persistent with replication, 1 write endpoint, sharding option
-## rds
+## 3.2. rds
 - same region read replicas can be promoted, it becomes its own primary
 - read replicas have its own endpoint
 - xregion read replicas, not for sql server engine
@@ -103,7 +118,7 @@
 - single endpoint, round robin loadbalancing, 15 rr per primary, 5 rds rr per primary
 - instead of multi-az mode, it's not a active/passive, more throughput
 - promotional tier to rank promotion order
-## loose coupling
+## 3.3. loose coupling
 - 1 ec2, 1 r53(cname), 1 static public ip through elastic ip, ip will change with instance restart due to dhcp, eip is region scoped not az scoped can be reassgined.
 - r53(alias record to elb dns) -> alb, multi ec2 in multi az
 - multi region, r53(a record) to multiple region's alb dns with 1 as primary, health check against elb 1, fail-over record return 2nd region.  Active/passive, 2ndary does not serve traffic
@@ -115,16 +130,376 @@
 - elb healthcheck: check ec2(clb/nlb/alb/glb), check ip(nlb/alb/glb), check lambda(alb)
 - elb/asg/fsx/rds single vs multi az
 - efs is region scoped, can only access through mount point which is az scopped(elastic network interfaces within subnet of your az), ecs/eks/lambda can mount efs 
-### r53 routing
+### 3.3.1. r53 routing
 - r53 simple round robin, equal weights, multivalue answer routing = choose 8 healthy at random
 - weighted routing to backend alb endpoint
 - latency-based routing
 - failover(active/passive) routing
 - alias record, apex record has to be a record(ip), aws allows alias record(pointer for resource) for alb/s3/cloudfront/apigateway/vpcendpoint
-# 3. Deployment/Automation
-
-# 4. Security
-
-# 5. Networking
-
-# 6. Cost
+### 3.3.2. backup and restore
+- ec2, disabled by default, manual only
+- rds, default enabled, 0-35 days, point in time recovery
+- aurora, can't disable, 1-35 days, pitr
+- redshift, enabled, no pitr, 35 days
+- dynamodb, default, 35 days, pitr
+- redshift not supported by aws backup
+- ec2 data lifecycle manager(DLM), but aws backup is better
+- aws backup, backup vault/plan/job/restore point.
+- fsx, ec2, efs, dynamo,ebs,rds,storage gateway
+- create tag on resource, need to have a vault to store, plan, job against resource store in vault
+- backup plan: create rules -> template/json, specify resource, what vault, frequency, retenstion, optionally add copy function and choose region/account's vault
+- back in local region then create other region backup.
+- vault
+- plan
+  - build new plan
+  - rules
+    - vault
+    - frequency
+    - retention
+    - copy to destination(region) - vault name
+  - assgin resources
+    - tag key and value
+- rds restore tasks: automated/manual-snapshot/s3/promote-read-replica
+- aurora can rewind instead of recreate
+- redshift is az scoped can move az
+- s3 versioning, default off, can't remove, but can suspend, attach version id to each version of an object
+- enabling versioning will cause performance issue if too many objects, lifecycle rules can help.
+- transition and expire, s3 standard -> s3 intelligent tiering -> s3 standard-IA -> s3 one zone-IA -> s3 glacier -> s3 glacier deep archive
+- lifecycle can transition current version, transition previous version, expire current version, delete expired delete markers, delete incomplete multipart uploads
+- glacier vault lock, permission policy, enforce lifecycle rules, deny delete
+- s3 replication, require versioning, iam role
+  - bucket object avail elsewhere same region same account
+  - same account xregion
+  - xregion xaccount, can choose ownership to be changed
+  - multiple destination, can choose diff lifecycle and set priority order
+  - multi-way from multiple buckets
+  - pre-existing object can only be replicated by aws support
+- RTO(recovery time objective): max acceptable delay for interruption
+- RPO(recovery point objective): max acceptable amount of time since last recovery
+- backup & restore
+  - point in time backups, 
+  - restore compute
+  - restore data
+  - dns cut over
+  - CI/CD and monitoring
+  - <24 hr
+- pilot light
+  - provision in aws
+  - configure replication from on-prem to cloud
+  - during execution, scale compute, configure cicd
+  - dns cut over
+  - <hours
+- warm standby
+  - 2 way replication, 1 way, configure aws service point to on-prem
+  - configure dns with weighted RR
+  - execution: scale compute then cut over
+  - < minutes
+- active-active
+  - already scaled out to full load and configured DNS
+  - execution: DNS failover
+# 4. Deployment/Automation (8 - 9)
+- Create AMI:
+- Option 1: aws ec2 create-image --description --instance-id --name --no-reboot
+- Option 2: aws backup, need vault, plan
+  - aws backup start-backup-job --backup-vault-name --resource-arn --iam-role-arn
+- Option 3: ec2 image builder
+  - img recipe: select image(base ami), build components, test components, specify ebs
+  - pipeline uses recipe with schedule and distribution settings(copy to another account)
+- Create components
+- Create recipe, base/build components(standard or owned by me), EBS
+- Create pipeline, pick recipe(base/testcompoents/ebs), pick infra(default vpc), distro(shared to other regions)
+## 4.1. cloudformation
+- aws cloudformation create-stack/deploy --no-execute-changeset, update-stack, validate-teamplte, detect-stack-drift
+- rds and elasticache allow xregion
+- custom lambda deploy multi region
+- cf stack-sets multi region
+- resource access manager, use az ids, share specific centralized management, no iam needed
+- subnet sharing, all accounts must be same aws org, user of account can deploy into the shared subnet.  both sg and ec2 intances are owned by the account being shared to.
+- stack-sets, admin account -> target accounts
+## 4.2. updating
+- elastic beanstalk and opswork(in-place/rolling/canary/bluegreen/all-at-once)
+- inplace(rolling), deregister target group
+- blue-green, r53 weighted rr 100% blue, then v2 app deploy with 0 weight, gradually update weight transfter, at last deprovision v1
+- canary, deregister 1 instance from target group and update this instance to v2.
+- aws ec2 describe-subnets --region --subnet-ids --query availableIPCount
+- aws sts decode-authorization-message --region --encode-message base64
+## 4.3. automation
+- opswork:
+  - app repo contains all config values for variables
+  - cookbook repo container recipes
+  - stacks has layers, app repo apply to stack levels
+  - golden ami ssm automation: launch ec2 from base ami -> patches -> stop isntance and create ami -> eventbridge tag and lambda, -> launch new instance with previous ami -> execute inspector -> send findings via sns -> human approve ami and tag for distribution
+  - cloudformation automation: vpc/subnet stack + param + changeset -> add nested stacks
+- ssm patch manager
+  - instance os needs to be supported and ssm agent installed, ssm endpoint needs to be accessed, ssm managed s3 needs to be accessed, ssm patch source repository also needs to be aceccesible.
+  - patch baseline, existing baselines(os,product,severity), patch group are tags which are associated with patch baseline attached to instances, instances
+  - aws ssm run-command aws-runpatchbaseline document
+  - create patch baseline, product(os), classification, severity(critical), autoapprove, exceptions, sources,
+  - modify patch group, any instance with tag key: "Patch Group" will be associated with this patchline
+- scheduled automation option: eventbridge
+  - schedule
+  - eventbus
+  - target: lambda, run-command
+  - retry
+  - DLQ
+  - permission
+- scheduled automation option: aws config rules, can find things out of compliance
+  - rule type: managed/custom rule
+  - trigger type: base on config changes or periodic
+  - remediation: ssm documents
+    - add/find rule
+    - ebs aws managed rules from aws config
+    - resources: ebs
+    - trigger type on change
+    - parameter
+# 5. Security
+## 5.1. permission evaluation
+- action -> permission evaluation engine
+  - principal wants to perform action, 
+  - default answer implicit deny, there must be an allow somewhere to allow you to perform action
+  - look for explicit deny which trumps all else
+  - if account under aws org and has scp, denied unless there is an explicit allow from scp
+  - resource level policy,
+  - permission boundaries,
+  - session policies, if not permissive, denied
+  - identity based policy
+- iam roles(similar to sudo command)
+  - trust policy: what pricipal can assume role
+  - permission policies: what priviliges can be gained
+- SAML federation
+  - upload local identity provider, metadata.xml upload, configure what user can assume to what roles
+  - user auth against local idp, idp return SAML assertion, user then issue sts:assumeRoleWithSAML, sts then return temp cred
+- resource-based policies: lambda/sns/sqs/api/backup/efs/s3
+- policy condition, specify conditions for when policy is in effect
+  - exact match
+- cloudtrail, audit trail of api actions, log both successes and failures, not enabled by default
+- transfer to s3, transfer to cwl(optional), log file validation(have not been modified)
+- cwl metric filter, cwl insights, cloudtrail insights, management events, data events(lmabda/s3/dynamodb)
+- iam access analyzer, if granted external access(zone of trust, s3/iam/kms/lambda/sqs/secretsmanager)
+- iam policy simulator, test users/groups/roles/scp/boundaries/resource policies/conditions
+- aws org scp: supports OU structure, can allow(boundary), can deny, affact iam users/roles not resource policies, affect root credentials, inherited
+- exceptions: management account not covered by scp, service-linked roles, root user
+- management account(root), -> nested OUs -> member accounts
+- if permission not allowed in root, no child can use
+- only boundary, still need permission policy to grant principals to use permission
+- iam permission boundaries, user/role/policy but not group, act as guardrails, specify maximum permission.  Actual permission will be the union of permission boundaries and permission policies
+- aws trusted advisor, online tool not service, series of dashboards
+  - security group: ports unrestricted
+  - iam use: 
+  - mfs auth on root
+  - ebs public snapshot
+  - rds public snapshot
+  - SG
+  - RDS
+  - CLOUDTRAIL
+  - R53 SPF
+  - ELB 
+  - CLOUDFRONT CERTS
+  - EXPOSED ACCESS KEYS: check github
+  - IAM KEY ROTATION
+- accounts for function or teams, root account should have no resources, shared OU
+## enforcing data classification
+- aws config, passive service, create rules genrate dashboard to show in-compliance
+- eventbridge, custom options
+- security hub -> reports
+- macie, generate reports it also uses ML
+- s3 lifecycle active but no reports
+- glacier lock active and custom option
+- s3 lifecycle rules, multiple rules.
+  - archive 30 days, delete after 1 year, everything in bucket, transition to glacier in 30 days,
+  - delete rule(expire) after 1 year
+## encrption
+- kms, region scope, multi-tenant, generate/store master key/upload/generate key pairs/ generate data keys.  does NOT encrypt data, does not store data key
+- CMK key policy, default no root access, user/role/account/policies
+- key admin, crud key material, delete key
+- key user, encrypt/decrpt/create data key
+- key grants, allow delegate temp permissions, allow only, no deny
+  - app request new data key from kms
+  - kms check key policy for this user permission
+  - kms return data key in plantext and data key that has been encrpted by cmk master key material
+  - app can use plantext key to encrypt data, client then discard the plantext key and store encrpted data with encrypted key as metadata
+  - app reach out to storage and retrieve encrypted data key and send to kms
+  - kms then return plaintext key which app will use to decrpt
+- aurora,backup,cloudtrail,dynamodb,fsx,snowball/cone/mobile,storage gateway default at-rest encryption
+- ebs, efs, ecr, elasticcache, kinesis firehose, redshift, rds, s3, sns, sqs can be turned on
+  - kms, cmk create
+  - symetric type
+  - key material origin(kms, custom key store cloudhsm)
+  - alias
+  - cmk key admin permission, choose iam user and roles who can administer this key through api
+  - define key usage permission, choose iam user and roles who can use
+  - get key id.  aws kms enable-key-rotation --key-id --region
+## ssl
+- cloudfront, allow tls or custom tls
+- custom tls on api gateway, gw must have dns cname records listed in the config for tls
+- alb allows 25 certs, classic/network support 1 tls cert, gateway lb operate at layer 3 and has no listener
+- elb does not validate tls
+- acm for wildcard certs and private ca to generate selfsigned certs. us-east-1 only
+- region scoped, provision ssl certs, upload custom cert, cloudfront/elb/apigateway
+- manage renewal
+- s3 in-transit encrption
+## secrets
+- secrets manager, region scoped, multi-region secrets, 65kb data, versioned, iam policies, resource-based policies, kms for at-rest encrption, use x-service, use with dbs for rotation
+- aurora, rds, sql server, documentdb, redshift
+  - sm uses kms for encryption with default cmk or create own
+  - create secret and specify kmks cmk to be used
+  - grant permissions to the secret by creating iam policies/roles for access
+- ssm parameter store, 4k data up to 8kb, optional encryption, no native intergration with rds
+## reports and findings
+- security hub, central view of security alerts
+  - guardduty findings to aws detective for remediation
+  - inspector
+  - macie
+  - ssm patch manager compliance
+  - iam access analyzer findings
+  - firewall manager findings
+  - export ssm opscenter(create tickets)
+  - export aws audit manager
+- static json object
+- from security hub's import findings/custom actions/insight results send to eventbridge which then send to lambda/run-command/sns topic for remediation
+- guardduty findings, generate dashboard or cwl or s3
+- aws config, dashboard, sns, rule remediation
+- inspector, region scoped, os security audit, ec2 only, execute on-demand or schedule, need agent. need sns topic. inspector tempalte -> rules packages
+- inspector targets
+- inspector schedule
+# 6. Networking
+## network
+- public subnet, igw
+- private subnet, nat gw
+- no internet access, only through vpn
+- route table only operate on traffic leaving a subnet and for non-vpc network
+- destination of cidr and target of local = default RT
+- NACLs operate on traffic enter and leaving a subnet
+- iwg general usage of aws public network
+- ENI/ENA/EFA is only way to communicate with ec2
+- sg ingress only operate on inbound-initiated traffic, attached to eni
+- sg egress only operate on outbound-initiated traffic, attached to eni
+- nat gateway, proxy exit only traffic to non-vpc destination via internet gateway.
+- gateway loadbalancer needs asg, provides scaling for outbound proxy
+- order
+  - vpc, name, cidr
+  - subnets with azs
+  - igw creation and attachment to vpc(not subnet)
+  - route table add to vpc, add route with igw as target, and subnet association under rt with public subnet
+  - private subnet
+  - nat gateway launched in public subnet needs EIP
+  - create 2nd route table, add route with nat gw as target, and subnet association under rt with private subnet
+  - vpc only subnet
+  - create nacl under vpc, add all traffic rule destination to vpc only subnet as denied, then subnet association with public subnet.  This prevent all traffic from public subnet egress into vpc only subnet.
+- gateway endpoints are private connection to same region s3/dynamodb only
+- Virtual Private Gateway used to route outbound via VPN or Direct Connect with encrption
+- VPC peering, connect to another vpc in diff account/region, as long as no overlapping cidr range
+- Interface endpoints route outbound to aws services and to privateLink(other customer private endpoints via private network) offerings
+- GateWay LoadBalancer endpoint traffic to a gwlb in a seperate vpc, centralize egress vpc
+- Transit gateway attachment, route to TG within same region
+## waf
+- can be global or region
+- stateful inspection of requests
+- count/allow/block
+- add custom request headers
+- layer 7
+  - rule action: count/allow/block
+  - rule statements: geographic match/sqli attack/regex...
+  - associate rules with web acl
+  - attach web acl with resources: api endpoint/alb/cloudfront dist(global)
+- aws shield, layer 3(ip) and 4(tcp/udp) protection, focus on cloudfront and r53
+- aws shield advanced, layer 7 added, waf included, focus also on elastic ip
+  - waf/shield, create web acl
+  - choose cf(global) or regional
+  - add rules, managed rules, add to web acl
+  - pushed to cloudwatch
+## r53
+- hosted zone, optionally register domain, public zone(internet) or private zone(associate with vpc, vpc needs enableDnsHostnames and enableDnsSupport)
+- records:
+  - name
+  - type, alias record -> resource name
+  - value
+  - ttl
+  - routing policy type
+- traffic policy
+  - flowchart to create/update many records at once
+  - visual editor
+  - versioning
+  - onlyway to use geoproximty
+- traffic policy flow
+  - name
+  - version/desc
+  - dns type
+  - connect to: failover/geolocation/latency/geoproximity->endpoint location(region, cordinates)
+  - value type: cloudfront/elb/s3/dns value
+  - value: distribution name
+- routing policy geolocation routing: continent or states, if client is in area use this disregard latency, requires default
+- geolocation routing record creation:
+  - name
+  - type
+  - ttl
+  - value route traffic to
+  - location: continent/country/us state
+  - health check
+  - record id
+- geoproximity routing: just like geolocation but with bias value assignable
+  - requires traffic policy
+  - endpoint can be region or lat/long
+  - increasing bias increases geographic area directed to the endpoint while at the same time decrease other areas
+- r53
+  - zone, diff version of site in diff region
+  - new record, type A
+  - elastic ip from ec2, routing policy geolocation, location: states
+- simple AD(part of aws directory services) dns forwarder
+  - create simple AD with diff domain,
+  - configure on-prem dns to forward requests to simple ad across vpn to r53 zone
+  - if want to resolve on-prem from vpc, configure vpc to use on-prem dns via dhcp 
+- aws ds/ad
+- r53 resolver:
+  - inbound endpoint, create inbound endpoint and associate with subnets and zones
+  - configure on-prem dns to forward requests to endpoint across vpn/dx
+  - create outbound endpoint and associate with domains and on-prem dns across vpn/dx
+  - ensure on-prem dns allow forwarded requests from endpoint
+## cdn
+- cf, global scope, stored in edge location, multiple origin types
+- can use any internet accesible endpoint as origin, alb,ec2,external,s3,api gateway,elemental mediaStore
+  - add origin, origin group
+  - access(OAI)
+  - security(TLS)
+  - geo restrictions
+  - acces log
+  - lambda@edge
+  - waf web acl
+- s3 origin access identity(OAI)
+  - make s3 resource private even bucket is public
+  - only for CF
+  - can't use with s3 static website endpoint
+- s3 oai
+  - create s3 with global read
+  - create cf distribution with s3 bucket as origin
+  - create OAI and associate with s3 origin
+  - change bucket policy or ACLs for OAI-only access
+- OAI alternative
+  - cloudfront signed url
+  - s3 signed urls
+  - add custom cloudfront headers, change bucket policy to require CF headers.  Can be used if s3 is configured to be used at static website
+- s3 oai with cf
+  - s3 bucket policy: enable block through acl
+  - cf: origin access identity
+  - cf distribution: web distro, origin bucket, restrict bucket access
+  - allow cf with oai header
+- s3 static website, only GET and HEAD requests, bucket name must match cname fqdn
+- configure s3 block public access either through object acl or bucket policy for public read
+- inbound resolver is for vpc accepting non-vpc requests
+## troubleshooting
+- if src and dest in same subnet, sg issue
+- if src and dest in diff subnet, sg and nacl issue
+- if src and dest in diff vpc, sg and nacl and routing due to vpc peering
+- if dest is gateway endpoint, sg and nacl and route table
+- if dest is interface endpoint, route table is not a possible issue
+- if dest is on-prem, on-prem fw could also be issue
+- 1 rt per subnet, 1 sg per app tier few rules, use nacl for denying
+- vpc flow log: variable scope, log traffic, to s3 or cwl
+- can apply at eni or subnet or entire vpc
+- space delimited, eni-id, srcaddr, destaddr, dstport, start and end time, action
+- vpc traffic mirroring, deep packet inspection, log all network activity , apply to single eni, deliver to ec2/nlb, passive only
+- aws iam create-role --assume-role-policy-document trustpolicy.json --role-name flow-logs-test
+- aws iam put-role-policy --role-name flow-logs-test --policy-name flow-logs-policy --policy-document policy.json
+- aws logs create-log-group --log-group-name ab
+- cloudfront s3 should use s3-website-region url instead of s3 api url endpoint
+# 7. Cost
