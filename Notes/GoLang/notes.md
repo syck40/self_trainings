@@ -5,3 +5,6 @@
 - fmt.Fprint, with io writer, fmt.Fprint(os.Stdout, foo)
 - fmt.Fprintln, tabWriter, fmt.Fprintln(w, "")
 - fmt.Fprintf
+
+# items
+- if, for, switch, func, interface, methods, slice, map, struct

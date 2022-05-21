@@ -114,9 +114,13 @@ well-architected labs
 - redis, while az scoped, persistent with replication, 1 write endpoint, sharding option
 ## 3.2. rds
 - same region read replicas can be promoted, it becomes its own primary
-- read replicas have its own endpoint
+- read replicas have its own endpoint, 5 rr, can be in diff region,  replication is asyncronous, rr can be built off multi-az db, rr can be themselves multi-az
+- rr can be promoted to a standalone db
+- creating rr, aws takes snapshot off multi-az standby node or primary
+- mysql/postgre/maria/sqlserver aws uses native async replication to update
+- aurora rr uses a virtualized storage layer, share same underlying storage as source instance to save cost
 - xregion read replicas, not for sql server engine
-- multi az, primary and standby, both writen to syncronisly.  DNS change for fail-over
+- multi az, primary and standby, both writen to syncronous physical replication to keep standby current with primary.  RDS automatically DNS change for fail-over.
 - active/passive mode, don't get multiple endpoint for multi az mode
 - read replica, seperate from multi-az mode, has unique endpoints, 5 RR per primary
 - a read replica can be a primary and muti-az even tho it's being replicated to
