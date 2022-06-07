@@ -1,0 +1,15 @@
+{
+		"Id": 1,
+		"Content": "first",
+		"Author": {
+				"Id": 1,
+				"Name": "jonny"
+		},
+		"Comments": [
+				{
+						"Id": 1,
+						"Content": "first comment",
+						"Author": "jonny"
+				}
+		]
+}

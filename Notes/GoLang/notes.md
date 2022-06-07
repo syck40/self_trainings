@@ -8,3 +8,4 @@
 
 # items
 - if, for, switch, func, interface, methods, slice, map, struct
+- var,operator,logic,loop,core type,complex type,func,error,interfaces,packages,time,json,file,sql,http,concurrent

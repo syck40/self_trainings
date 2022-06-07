@@ -41,6 +41,69 @@ well-architected labs
 # 1. misc
 - aws --generate-cli-skeleton > file.json, aws --cli-input-json file.json
 - aws --query is clientside --filter is serverside
+- valid alarm states for cloudwatch: alarm, ok, insuff data
+- cw alarm limit per region, 5000
+- cw data point x evaluation time period, 4 data pt per 1 minute time = 4 in 5 minutes
+- cw keeps 1 min for 15 days, 5 min for 63 days
+- cw dimentions: kv pair part of identity of a metric, 10 dimensions to a metric.  like categories, use dimensions to filter result
+- cw does system(hardware) and instance(network,software) health checks on ec2
+- cw instance healthcheck fail example: exhausted memory, bad filesystem, networking or startup misconfig
+- cw ec2 monitoring type(basic(5min), detailed(1m))
+- during autoscaling, cw sends instruction to asg on what to do, this is a policy
+- predictive scaling(requires 2 weeks)/schedule/cloudwatch trigger asg
+- asg api applies to ecs/dynamodb/aurora/, rds is not
+- valid states, pending and inService
+- launch config not versioned, launch template versioned
+- launch config has to be set up manually after updating the ec2 instance
+- rds will not trigger fail-over if db run out of space because it's a managed service
+- sns doesn't guarantee at least once, sqs does and it's ok with receive more than once per msg
+- ebs is az bound, make snapshot to move az
+- ebs encryption can be either client-level which is done by os or volume level which is managed by aws
+- client lvl manage your own keys
+- 50 iops per provisioned gb, a drive of 400 gb -> max 20000
+- s3 63 char name limit, no underscore
+- s3 url can be virtual-host(bucket name part of host) style or path-style
+- customer managed iam policy, 5 versions.  inline policy only apply to 1 principal
+- s3:deleteobjectVersion deletes a file regardless of whether versioning is enabled.
+- s3 condition, datelessthan
+- resource-based policy requires principal(who is allowed or denied access to a resource), sqs/sns, no conditions section
+- ec2 public ip from instance metadata, not ifconfig since it's not assigned to a interface
+- vpn needs virtual private gateway and customer gateway
+- elb healthcheck can monitor running application then use it in the asg will ensure instance replacement when app fails
+- instances needs a public ip to download updates
+  - sg bound to network interface, nacl bind to subnet
+  - sg is stateful, nacl is stateless
+  - sg allow only, nacl and allow or denied
+  - both have seperate rule for inbound and outbound
+  - both denied all inbound by default when created
+  - sg default allow outbound by default, nacl default to denied outbound
+  - sg evaluate all rules then decide, nacl evalute lowest number rule 1st
+- geoproximity routing base on distance from location, geolocation base specific region user are in
+- multi region asg: asg in each region, elb in each region, r53 weighted routing policy to each elb
+- r53, simple basic resource record or multivalue answer resource record without a health check will always return public ip of the instance
+- nat instance, source/destination check must be disabled.  nat instance need public ip but doesn't require an elastic ip.
+- cidr between 16 and 28, ipv6 /56
+- ENI must have only 1 primary private from vpc, 1 or more 2ndary private from vpc, 1 elastic ip per private address, 1 public ipv4, 1 or more sg
+- vpc doesn't support multicast, vpc do support rfc1918 addresses
+- vpn or peering will allow instances see private ip as source.  Internet gateway allow an instance to obtain a public ip.
+- ec2 collect cpu metrics every minute
+- cloudwatch detailed monitoring sends every minute
+- high resolution metric can be stored with up to 1-second resolution, regular resolution stored at no less than 1 min
+- cloudwatch statistics: Sum, Min, Max, Avg, Sample and Percentile
+- cw store 1 hour resolution for 15 month
+- cw sum add metric values in a given period
+- cw dimension identify metric with the same name in same namespace
+- cw metric 1 min interval period with sum statistic will graph exact data point
+- cw alarm: ALARM/OK/INSUFFICIENT_DATA
+- s3 standard-IA has slightly lower avail and higher cost for GET, glacier has less avail.
+- aws budgets can alert for resource utilization, cost explorer can't send notification
+- rds automated snapshots enable point-in-time recovery which archives db logs to s3 every 5 min.
+- ebs volume queue length metric measures totaly number of read and write op waiting for completion.
+- cw events and aws config can monitor s3 for new bucket creation and alert when create or delete
+- ebs data lifecycle manager auto take snapshots and retains only the latest
+- rds instance class with memory-optimized instances have dedicated bandwidth for ebs storage, standard are not ebs optimized, burst-capable are for test workloads
+- rds will retain automatic snapshot for 7 days by default, you can choose 1 to 35 days.  Manual snapshot indefinitely.
+- cw log group retention can be set per log group
 
 # 2. Monitoring/Logging/Remediation
 - Introduction to DevOps on AWS(white paper)
